@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAGRO Service Centre Handbook</title>
+<style>
+:root{--orange:#d9652f;--dark:#151515;--cream:#fff7ef;--paper:#fff;--line:#e5ded8;--green:#2f7d3d;--blue:#2e6fd8;--amber:#a36b00;--red:#b9473d;--muted:#6f6f6f;--bg:#f3f0ec;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Noto Sans Malayalam",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--dark);font-family:var(--font);line-height:1.65}
+header{background:linear-gradient(135deg,#111,#2b2b2b);color:#fff;padding:32px 22px}
+.logo{font-size:44px;font-weight:950;font-style:italic;letter-spacing:-2px}
+.logo:before{content:"";display:inline-block;width:34px;height:14px;background:var(--orange);transform:skew(-20deg);margin-right:10px}
+header h1{margin:12px 0 4px;font-size:28px}
+header p{margin:0;color:#ddd;max-width:780px}
+nav{background:#fff;border-bottom:1px solid var(--line);padding:12px 18px;position:sticky;top:0;z-index:10;overflow:auto;white-space:nowrap}
+nav a{display:inline-block;color:var(--orange);text-decoration:none;font-weight:800;margin-right:18px}
+main{max-width:980px;margin:0 auto;padding:18px}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:20px;margin:18px 0;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+.section-head{padding:18px 20px;border-bottom:1px solid var(--line);background:var(--cream)}
+.section-head h2{margin:0;font-size:24px}
+.section-head small{color:var(--muted);font-weight:700}
+.content{padding:20px}
+.callout{border-left:6px solid var(--orange);background:#fff4ec;padding:14px 16px;border-radius:12px;font-weight:800;margin:14px 0}
+.green{border-left-color:var(--green);background:#edf8ef}.blue{border-left-color:var(--blue);background:#edf4ff}.amber{border-left-color:var(--amber);background:#fff7df}.red{border-left-color:var(--red);background:#fff0ef}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+.card h3{margin:0 0 8px;font-size:20px}
+.badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:900;background:#fff0e8;color:var(--orange);margin-right:6px}
+.flow{display:grid;gap:10px}
+.step{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);background:#fff;border-radius:16px;padding:14px}
+.num{width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;flex:none}
+.step b{font-size:18px}
+table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px}
+th,td{border:1px solid var(--line);padding:12px;vertical-align:top}
+th{background:#151515;color:#fff;text-align:left}
+td:first-child{font-weight:800}
+ul{padding-left:22px} li{margin:7px 0}
+.print-note{text-align:center;color:var(--muted);margin:26px 0;font-size:14px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}header h1{font-size:24px}.logo{font-size:36px}}
+@media print{nav{display:none}body{background:#fff}.section{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">TAGRO</div>
+  <h1>പുതിയ Service Centre സംവിധാനം</h1>
+  <p>മെഷീൻ സ്വീകരിക്കുന്നത് മുതൽ Delivery വരെ — ഓരോ ഘട്ടവും വ്യക്തമായി, വേഗത്തിൽ, ഒരേ രീതിയിൽ രേഖപ്പെടുത്താൻ.</p>
+</header>
+
+<nav>
+  <a href="#why">എന്തിനാണ്?</a>
+  <a href="#old-new">പഴയ ഷീറ്റ് vs പുതിയ സംവിധാനം</a>
+  <a href="#flow">Shop-floor Flow</a>
+  <a href="#roles">ആർക്കെന്ത്?</a>
+  <a href="#essential">Essential കാര്യങ്ങൾ</a>
+  <a href="#benefits">ഗുണങ്ങൾ</a>
+</nav>
+
+<main>
+<section class="section" id="why">
+  <div class="section-head"><h2>1. എന്തിനാണ് ഈ മാറ്റം?</h2><small>സിസ്റ്റം ആളുകളെ നിയന്ത്രിക്കാൻ അല്ല; മെഷീനിന്റെ Service journey വ്യക്തമായി സൂക്ഷിക്കാനാണ്.</small></div>
+  <div class="content">
+    <div class="callout">ഈ സംവിധാനം മെഷീൻ സ്വീകരിച്ച നിമിഷം മുതൽ Delivery വരെയുള്ള യാത്ര രേഖപ്പെടുത്തുന്നു. പ്രധാനമായി കാണുന്നത് ജോലി എവിടെയാണ് നിൽക്കുന്നത് എന്നതാണ്.</div>
+    <p>ഇപ്പോഴത്തെ സർവീസ് ഷീറ്റ് ഒരു ജോലിയുടെ രേഖയാണ്. പുതിയ സംവിധാനം അതേ വിവരങ്ങൾ കൂടുതൽ തിരയാവുന്ന രീതിയിൽ സൂക്ഷിക്കുന്നു. പഴയ ജോലികൾ, ഉപയോഗിച്ച പാർട്സ്, Estimate, Customer approval, Photos, Delivery status എന്നിവ പിന്നീട് എളുപ്പത്തിൽ കണ്ടെത്താം.</p>
+  </div>
+</section>
+
+<section class="section" id="old-new">
+  <div class="section-head"><h2>2. പഴയ Service Sheet & പുതിയ Form</h2><small>രണ്ടും ഒരേ ജോലി ചെയ്യുന്നു. പുതിയതിൽ കുറച്ച് control points കൂടി ചേർക്കുന്നു.</small></div>
+  <div class="content">
+    <table>
+      <tr><th>ഇപ്പോഴത്തെ Service Sheet</th><th>പുതിയ Service Centre സംവിധാനം</th></tr>
+      <tr><td>Customer പേര് / ഫോൺ എഴുതുന്നു</td><td>Phone / name / alias നൽകി പഴയ customer കണ്ടെത്താം</td></tr>
+      <tr><td>Machine model എഴുതുന്നു</td><td>Customer-ന്റെ മുൻ മെഷീനുകൾ കാണിക്കും; select ചെയ്താൽ details auto-fill</td></tr>
+      <tr><td>Complaint എഴുതുന്നു</td><td>Common complaints button ആയി തിരഞ്ഞെടുക്കാം; comment ചേർക്കാം</td></tr>
+      <tr><td>Parts / labour പിന്നീട് എഴുതുന്നു</td><td>Estimate, parts, labour, edits എല്ലാം job history-ൽ സൂക്ഷിക്കും</td></tr>
+      <tr><td>Work status അറിയാൻ ചോദിക്കണം</td><td>Received, Work in Progress, Hold, Ready, Delivered status കാണാം</td></tr>
+      <tr><td>PO ആവശ്യം വേറെ പറയണം</td><td>Job-ിൽ നിന്നുതന്നെ Indent / PO request raise ചെയ്യാം</td></tr>
+      <tr><td>ഷീറ്റ് നഷ്ടപ്പെടാം / തിരയാൻ സമയം</td><td>Phone, serial, alias, work order ഉപയോഗിച്ച് തിരയാം</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="flow">
+  <div class="section-head"><h2>3. Shop-floor Flow</h2><small>Screen-കൾ അല്ല, മെഷീനിന്റെ യാത്രയാണ് പ്രധാനത്.</small></div>
+  <div class="content flow">
+    <div class="step"><div class="num">1</div><div><b>Customer comes to reception</b><br>Phone / name / alias, machine, serial number, customer wants എന്നിവ രേഖപ്പെടുത്തുന്നു. Staff, branch, date, time system തന്നെ ചേർക്കും.</div></div>
+    <div class="step"><div class="num">2</div><div><b>Machine moved to service</b><br>Technician / manager observation ചേർക്കുന്നു. Photos ചേർക്കാം.</div></div>
+    <div class="step"><div class="num">3</div><div><b>Estimate ready</b><br>Parts required, labour required, estimate amount. Edit ചെയ്താൽ system അത് രേഖപ്പെടുത്തും.</div></div>
+    <div class="step"><div class="num">4</div><div><b>Customer approval</b><br>Customer അംഗീകരിച്ചാൽ work തുടങ്ങാൻ clear. Customer, manager, mechanic എന്നിവർക്ക് confirmation.</div></div>
+    <div class="step"><div class="num">5</div><div><b>Work in progress</b><br>Start Work അമർത്തുമ്പോൾ time start. Parts ഉപയോഗിച്ചാൽ enter ചെയ്യുകയോ photo എടുക്കുകയോ ചെയ്യണം.</div></div>
+    <div class="step"><div class="num">6</div><div><b>Hold / complete</b><br>Work on Hold ആണെങ്കിൽ reason വേണം. Complete ആണെങ്കിൽ Test / Quality Check.</div></div>
+    <div class="step"><div class="num">7</div><div><b>Ready & Delivery</b><br>Bill copy, customer intimation, delivery acknowledgement, final status.</div></div>
+  </div>
+</section>
+
+<section class="section" id="roles">
+  <div class="section-head"><h2>4. ആർക്കെന്ത് ചെയ്യണം?</h2><small>ഓരോ ഘട്ടത്തിലും വേണ്ടതത്ര മാത്രം.</small></div>
+  <div class="content grid">
+    <div class="card"><h3>സർവീസ് കൗണ്ടറിൽ</h3><ul><li>Customer phone / name / alias നൽകുക</li><li>Machine select ചെയ്യുക</li><li>Serial number കിട്ടിയാൽ ചേർക്കുക</li><li>Customer പറഞ്ഞ complaint select / type ചെയ്യുക</li><li>Receive അമർത്തുക</li></ul></div>
+    <div class="card"><h3>Technician / Mechanic</h3><ul><li>Observation ചേർക്കുക</li><li>Parts required, labour required ചേർക്കുക</li><li>Work started / complete / hold action ഉപയോഗിക്കുക</li><li>Parts used enter ചെയ്യുകയോ photo ഇടുകയോ ചെയ്യുക</li><li>Test checklist പൂർത്തിയാക്കുക</li></ul></div>
+    <div class="card"><h3>Branch Manager</h3><ul><li>Daily machine list പരിശോധിക്കുക</li><li>Hold / waiting / ready not collected നോക്കുക</li><li>PO / indent review ചെയ്യുക</li><li>Weekend review acknowledge ചെയ്യുക</li></ul></div>
+    <div class="card"><h3>Owner View</h3><ul><li>All branches status</li><li>Completed machines</li><li>Exceptions</li><li>PO needs</li><li>Old pending jobs</li></ul></div>
+  </div>
+</section>
+
+<section class="section" id="essential">
+  <div class="section-head"><h2>5. ചില കാര്യങ്ങൾ എന്തുകൊണ്ട് നിർബന്ധം?</h2><small>ഇവ അധിക ജോലി പോലെ തോന്നാം, പക്ഷേ branch-നെ സഹായിക്കുന്ന control points ആണ്.</small></div>
+  <div class="content grid">
+    <div class="card"><h3><span class="badge">Serial Number</span></h3><p>ഒരേ customer-ന് പല machines ഉണ്ടാകാം. Phone മാറാം. Serial number machine-ന്റെ സ്ഥിരമായ identity ആണ്. Serial ഇല്ലാത്ത entries ദിവസവും flag ചെയ്യും.</p></div>
+    <div class="card"><h3><span class="badge">Estimate Approval</span></h3><p>Customer അംഗീകരിച്ച ശേഷം work തുടങ്ങിയത് രേഖപ്പെടുത്താം. പിന്നീട് തെറ്റിദ്ധാരണ കുറയും. Estimate edit ചെയ്താൽ അത് history-ൽ കാണും.</p></div>
+    <div class="card"><h3><span class="badge">Work Start / Complete</span></h3><p>ജോലി എവിടെയാണെന്ന് എല്ലാവർക്കും കാണാൻ. ഇത് competition അല്ല. Job flow clear ആക്കാനാണ്.</p></div>
+    <div class="card"><h3><span class="badge">Parts Photo / Entry</span></h3><p>Store-ൽ നിന്ന് എടുത്ത item job-ിനോട് ബന്ധിപ്പിക്കണം. Entry ചെയ്യാൻ സമയം ഇല്ലെങ്കിൽ photo പോലും useful ആണ്.</p></div>
+    <div class="card"><h3><span class="badge">Work On Hold Reason</span></h3><p>“എന്തുകൊണ്ട് complete ആയില്ല?” എന്ന ചോദ്യം ഒഴിവാക്കാൻ. Reason, expected date ചേർത്താൽ manager review എളുപ്പമാകും.</p></div>
+    <div class="card"><h3><span class="badge">Indent / PO Request</span></h3><p>Request ചെയ്യാം. വാങ്ങണോ, branch transfer വേണോ, wait ചെയ്യണോ എന്നത് manager / owner decision ആണ്.</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>6. ശ്രദ്ധിക്കേണ്ട 5 കാര്യങ്ങൾ</h2><small>ഇവ മാത്രം ശരിയായി ചെയ്താൽ system വളരെ ഉപകാരപ്രദമാകും.</small></div>
+  <div class="content">
+    <div class="callout green">1. Machine receive ചെയ്യുമ്പോൾ phone / alias / machine ശരിയായി select ചെയ്യുക.</div>
+    <div class="callout blue">2. Serial number കിട്ടിയാൽ നിർബന്ധമായി ചേർക്കുക.</div>
+    <div class="callout amber">3. Observation, estimate, approval കഴിഞ്ഞ ശേഷം മാത്രമേ work start ചെയ്യൂ.</div>
+    <div class="callout">4. Parts ഉപയോഗിക്കുമ്പോൾ job-ൽ entry അല്ലെങ്കിൽ photo ചേർക്കുക.</div>
+    <div class="callout red">5. Work complete / hold / ready / delivered action മറക്കരുത്.</div>
+  </div>
+</section>
+
+<section class="section" id="benefits">
+  <div class="section-head"><h2>7. ഇത് എങ്ങനെ സഹായിക്കും?</h2><small>Shop-നു മാത്രമല്ല, ഓരോ role-നും.</small></div>
+  <div class="content grid">
+    <div class="card"><h3>Service counter-ന്</h3><ul><li>Frequent customer വേഗത്തിൽ കണ്ടെത്താം</li><li>Alias ഉപയോഗിച്ച് search ചെയ്യാം</li><li>Previous machines auto-fill</li><li>Paper തിരയേണ്ട സമയം കുറയും</li></ul></div>
+    <div class="card"><h3>Mechanic / Technician-ന്</h3><ul><li>Machine history കാണാം</li><li>Previous complaints / parts അറിയാം</li><li>Work status clear</li><li>Indent job-ൽ നിന്നുതന്നെ raise ചെയ്യാം</li></ul></div>
+    <div class="card"><h3>Branch Manager-ന്</h3><ul><li>Daily machine list</li><li>Hold / waiting / ready not collected visibility</li><li>PO request ഒരിടത്ത്</li><li>Weekend review simple</li></ul></div>
+    <div class="card"><h3>Thumpassery Agro branches-ന്</h3><ul><li>All branches same process</li><li>Parts requirement visible</li><li>Branch transfer suggestions later possible</li><li>Customer confidence improves</li></ul></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>8. അവസാന കുറിപ്പ്</h2><small>ഇത് ഒരു പുതിയ form അല്ല. ഇത് service journey ആണ്.</small></div>
+  <div class="content">
+    <p>മുമ്പ് ഒരു service sheet ഒരു ദിവസത്തെ രേഖയായിരുന്നു. പുതിയ സംവിധാനത്തിൽ ഓരോ machine-നും അതിന്റെ service history ഉണ്ടാകും. ഇന്ന് ചെയ്ത repair, ആറുമാസത്തിന് ശേഷം വരുന്ന complaint, ഉപയോഗിച്ച parts, approval, photos — എല്ലാം അതേ machine history-യുടെ ഭാഗമാകും.</p>
+    <div class="callout green">ലക്ഷ്യം: ജോലി കൂടുതൽ വ്യക്തവും വേഗതയേറിയതും സുരക്ഷിതവുമാക്കുക.</div>
+  </div>
+</section>
+
+<p class="print-note">This HTML can be printed as a coloured handbook or shared as a mobile-friendly page.</p>
+</main>
+</body>
+</html>
