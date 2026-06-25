@@ -3,111 +3,819 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TAGRO Service Centre - Navigation Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TAGRO Service Centre — Workflow Prototype</title>
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;margin:0;background:#f5f5f5;color:#222;padding-bottom:90px}
-header{position:sticky;top:0;background:#fff;padding:14px 18px;border-bottom:1px solid #ddd;display:flex;align-items:center}
-.logo{font-size:32px;font-weight:900;font-style:italic;color:#111;text-decoration:none}
-.logo:before{content:"";display:inline-block;width:24px;height:10px;background:#d9652f;transform:skew(-20deg);margin-right:8px}
-.badge{margin-left:10px;background:#d9652f;color:#fff;padding:6px 10px;border-radius:8px;font-weight:700}
-.user{margin-left:auto;color:#d9652f;font-weight:700}
-main{padding:16px;max-width:760px;margin:auto}
-.card{background:#fff;border:1px solid #ddd;border-radius:16px;padding:18px;margin-bottom:16px}
-h2{margin:0 0 10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{display:block;text-align:center;text-decoration:none;padding:14px;border-radius:12px;border:1px solid #ddd;background:#fff;color:#111;font-weight:700}
-.primary{background:#d9652f;color:#fff;border-color:#d9652f}
-.stage{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.stage span{padding:8px 12px;border-radius:999px;border:1px solid #ccc}
-.done{background:#e8f5ea;color:#246b35}
-.active{background:#d9652f;color:#fff;border-color:#d9652f}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr)}
-.bottom a{padding:10px;text-align:center;text-decoration:none;color:#666;font-size:12px}
-.bottom b{display:block;font-size:22px}
-#feedback{position:fixed;right:16px;bottom:82px;background:#111;color:#fff;padding:12px 16px;border-radius:30px;text-decoration:none}
-textarea,input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;box-sizing:border-box}
-#sheet{display:none;position:fixed;inset:0;background:#0006}
-#panel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:18px;max-height:85%;overflow:auto}
+:root{
+  --orange:#d9652f;
+  --black:#121212;
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --line:#dedede;
+  --muted:#777;
+  --green:#2f7d3d;
+  --amber:#9b6b10;
+  --red:#b9473d;
+  --blue:#2e6fd8;
+  --shadow:0 5px 20px rgba(0,0,0,.06);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:var(--font);
+  color:var(--black);
+  padding-bottom:92px;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.logo{
+  font-size:28px;
+  font-weight:950;
+  font-style:italic;
+  letter-spacing:-1px;
+  color:#111;
+  text-decoration:none;
+  line-height:1;
+}
+.logo:before{
+  content:"";
+  display:inline-block;
+  width:22px;
+  height:10px;
+  background:var(--orange);
+  transform:skew(-20deg);
+  margin-right:8px;
+}
+.branch{
+  background:var(--orange);
+  color:#fff;
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:900;
+}
+.user{
+  margin-left:auto;
+  color:var(--orange);
+  font-weight:850;
+  font-size:13px;
+}
+.screen{display:none}
+.screen.active{display:block}
+main{
+  padding:14px;
+  max-width:820px;
+  margin:0 auto;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  margin-bottom:14px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.card-head{
+  padding:14px 16px;
+  border-bottom:1px solid #eee;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.card-head h2{
+  margin:0;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:#777;
+}
+.content{padding:16px}
+.hero{
+  font-size:24px;
+  font-weight:950;
+  margin-bottom:6px;
+}
+.sub{
+  color:var(--muted);
+  line-height:1.45;
+  font-size:15px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:52px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:#111;
+  text-decoration:none;
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+  text-align:center;
+}
+.btn.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.btn.red{border-color:#e7b7b0;color:var(--red)}
+.btn.black{background:#111;border-color:#111;color:#fff}
+.btn.block{width:100%;display:flex}
+.stat{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px 10px;
+  text-align:center;
+}
+.stat b{display:block;font-size:26px;line-height:1;font-weight:950}
+.stat span{display:block;font-size:11px;color:#777;text-transform:uppercase;letter-spacing:.5px;font-weight:900;margin-top:5px}
+label{
+  display:block;
+  font-size:11px;
+  color:#777;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-weight:900;
+  margin:14px 0 6px;
+}
+input,select,textarea{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:13px;
+  font-size:17px;
+  font-family:var(--font);
+}
+textarea{min-height:86px;resize:vertical}
+.listitem{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:10px;
+}
+.title{
+  font-size:18px;
+  font-weight:950;
+}
+.small{
+  font-size:13px;
+  color:#777;
+  line-height:1.45;
+  margin-top:4px;
+}
+.pill{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  background:#fff0e8;
+  color:var(--orange);
+  white-space:nowrap;
+}
+.pill.green{background:#e9f6ec;color:var(--green)}
+.pill.amber{background:#fff5d6;color:var(--amber)}
+.pill.red{background:#fdebea;color:var(--red)}
+.timeline{
+  position:relative;
+}
+.event{
+  display:grid;
+  grid-template-columns:74px 1fr;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+}
+.event:last-child{border-bottom:0}
+.time{
+  color:#777;
+  font-weight:900;
+  font-size:13px;
+}
+.status-strip{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding:10px 0 4px;
+}
+.stage{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 10px;
+  font-size:12px;
+  font-weight:900;
+  color:#777;
+}
+.stage.done{background:#e9f6ec;color:var(--green);border-color:#bfe0c6}
+.stage.active{background:var(--orange);border-color:var(--orange);color:#fff}
+.bottomnav{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:40;
+  background:#fff;
+  border-top:1px solid var(--line);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:4px;
+}
+.navbtn{
+  text-decoration:none;
+  color:#777;
+  text-align:center;
+  font-size:11px;
+  font-weight:900;
+  border-radius:12px;
+  padding:6px 3px;
+}
+.navbtn b{display:block;font-size:21px;margin-bottom:2px}
+.navbtn.active{background:#fff4ef;color:var(--orange)}
+.feedback{
+  position:fixed;
+  right:14px;
+  bottom:96px;
+  z-index:50;
+  background:#111;
+  color:#fff;
+  border:0;
+  border-radius:999px;
+  padding:12px 14px;
+  font-weight:950;
+  box-shadow:0 5px 18px rgba(0,0,0,.25);
+}
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:80;
+  background:rgba(0,0,0,.55);
+  align-items:flex-end;
+}
+.modal.open{display:flex}
+.sheet{
+  width:100%;
+  background:#fff;
+  border-radius:22px 22px 0 0;
+  padding:18px;
+  max-height:88vh;
+  overflow:auto;
+}
+.rategrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rate,.choice{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+  font-weight:900;
+}
+.choicegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.demo{
+  background:#fff7da;
+  border:1px solid #e4c658;
+  color:#725208;
+  font-weight:900;
+  border-radius:14px;
+  padding:12px 14px;
+  margin-bottom:14px;
+}
+.login-wrap{padding:34px 18px;max-width:520px;margin:0 auto}
+.login-logo{text-align:center;font-weight:950;font-style:italic;font-size:46px;letter-spacing:-2px;margin:44px 0 8px}
+.login-logo:before{
+  content:"";
+  display:inline-block;
+  width:32px;height:13px;background:var(--orange);transform:skew(-20deg);margin-right:8px
+}
+.center{text-align:center}
+.hidden{display:none}
+.notice{border-left:5px solid var(--orange);padding:12px;background:#fff7f1;border-radius:12px;margin-top:10px;color:#6e371c;font-weight:800}
+@media(max-width:420px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .hero{font-size:22px}
+  .rategrid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
+
+<section id="login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-logo">TAGRO</div>
+    <div class="center sub" style="letter-spacing:4px;font-weight:950;text-transform:uppercase">Service Centre</div>
+    <div class="card" style="margin-top:34px">
+      <div class="card-head"><h2>Login</h2></div>
+      <div class="content">
+        <label>Branch</label>
+        <select id="loginBranch" onchange="loadUsers()">
+          <option value="KVR">KVR — Karavaloor</option>
+          <option value="MDM">MDM — Marthandam</option>
+          <option value="PKM">PKM — Ponkunnam</option>
+          <option value="SKT">SKT — Shencottai</option>
+          <option value="NDD">NDD — Nedumangad</option>
+        </select>
+        <label>Staff</label>
+        <select id="loginUser"></select>
+        <label>PIN</label>
+        <input id="loginPin" inputmode="numeric" maxlength="4" placeholder="Demo PIN 1234">
+        <button class="btn primary block" style="margin-top:16px" onclick="login(false)">Login</button>
+        <button class="btn block" style="margin-top:10px" onclick="login(true)">Demo Mode</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="app" class="hidden">
 <header>
-<a href="#" class="logo">TAGRO</a><span class="badge">DEMO</span><span class="user">Demo</span>
+  <a class="logo" href="#" onclick="show('home')">TAGRO</a>
+  <span class="branch" id="branchBadge">KVR</span>
+  <span class="user" id="userBadge">Rajeev</span>
 </header>
-<main>
-<div class="card">
-<h2>🏠 Home</h2>
-<p>Prototype for navigation testing.</p>
-<div class="grid">
-<a class="btn primary" href="#receive">➕ Receive Machine</a>
-<a class="btn" href="#workshop">🔧 Workshop</a>
-<a class="btn" href="#purchase">📦 Purchase</a>
-<a class="btn" href="#reports">📊 Reports</a>
-</div>
-</div>
 
-<div id="receive" class="card">
-<h2>Quick Receive</h2>
-<input placeholder="Customer / Phone / Alias">
-<select><option>MS460</option><option>FS120</option><option>+ New Machine</option></select>
-<textarea placeholder="Complaint"></textarea>
-<p><a class="btn primary" href="#workshop">Receive Machine</a></p>
-</div>
-
-<div id="workshop" class="card">
-<h2>Workshop Queue</h2>
-<p><b>Victor Farms - MS460</b></p>
-<div class="stage">
-<span class="done">Received</span>
-<span class="active">Repair</span>
-<span>Test</span>
-<span>Ready</span>
-<span>Delivered</span>
-</div>
-<div class="grid">
-<a class="btn" href="#purchase">Raise PO</a>
-<a class="btn primary" href="#reports">Repair Complete</a>
-</div>
-</div>
-
-<div id="purchase" class="card">
-<h2>PO / Indent</h2>
-<p>Even if stock is available, staff can raise an indent.</p>
-<ul>
-<li>Clutch Assembly - Qty 2</li>
-<li>Carburettor Kit - Low Stock</li>
-</ul>
-</div>
-
-<div id="reports" class="card">
-<h2>Reports</h2>
-<p>Today's Jobs: 12</p>
-<p>Pending PO: 5</p>
-</div>
+<main id="demoBanner" class="hidden">
+  <div class="demo">DEMO MODE — practice workflow only. No real record is saved.</div>
 </main>
 
-<a id="feedback" href="#" onclick="document.getElementById('sheet').style.display='block';return false;">💡 അഭിപ്രായം</a>
+<section id="home" class="screen">
+<main>
+  <div class="card">
+    <div class="content">
+      <div class="hero">What happened now?</div>
+      <div class="sub">The app follows the machine journey. Tap the action that matches the shop-floor situation.</div>
+      <div class="grid2" style="margin-top:16px">
+        <button class="btn primary" onclick="show('receive')">Customer brought machine</button>
+        <button class="btn" onclick="show('queue')">Continue repair</button>
+        <button class="btn" onclick="show('ready')">Machine ready / delivery</button>
+        <button class="btn" onclick="show('purchase')">Need part / raise indent</button>
+      </div>
+    </div>
+  </div>
 
-<div id="sheet">
-<div id="panel">
-<h2>Malayalam Feedback</h2>
-<p>ഇത് പേപ്പറിനേക്കാൾ എളുപ്പമാണോ?</p>
-<label><input type="radio" name="r"> അതെ</label><br>
-<label><input type="radio" name="r"> ഒരുപോലെ</label><br>
-<label><input type="radio" name="r"> ഇല്ല</label>
-<p>ഒരു മാറ്റം മാത്രം പറയൂ</p>
-<textarea placeholder="Comment"></textarea>
-<p><a class="btn primary" href="#" onclick="document.getElementById('sheet').style.display='none';return false;">Submit</a></p>
-</div>
-</div>
+  <div class="grid3">
+    <div class="stat" onclick="show('daily')"><b>14</b><span>Open Machines</span></div>
+    <div class="stat" onclick="show('queue')"><b>4</b><span>Work In Progress</span></div>
+    <div class="stat" onclick="show('exceptions')"><b>6</b><span>Exceptions</span></div>
+  </div>
 
-<nav class="bottom">
-<a href="#"><b>🏠</b>Home</a>
-<a href="#receive"><b>➕</b>Receive</a>
-<a href="#workshop"><b>🔧</b>Workshop</a>
-<a href="#purchase"><b>📦</b>PO</a>
-<a href="#reports"><b>☰</b>More</a>
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><h2>Today</h2><span class="pill">Auto list</span></div>
+    <div class="content">
+      <div class="listitem">
+        <div class="title">Ready but not collected <span class="pill amber">3</span></div>
+        <div class="small">Customer intimation due / reminder check.</div>
+      </div>
+      <div class="listitem">
+        <div class="title">Work on hold <span class="pill red">2</span></div>
+        <div class="small">Manager must review reason and expected next date.</div>
+      </div>
+      <div class="listitem">
+        <div class="title">Missing serial numbers <span class="pill red">4</span></div>
+        <div class="small">Flagged daily until corrected.</div>
+      </div>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="receive" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>Reception — Receive Machine</h2><span class="pill green">Staff/date/time auto</span></div>
+    <div class="content">
+      <div class="notice">Reception enters only: customer, machine, and what customer wants.</div>
+
+      <label>Customer phone / name / alias</label>
+      <input id="custSearch" placeholder="Phone, name, local alias" oninput="showSuggestions()">
+      <div id="customerSuggestions" class="hidden" style="margin-top:10px">
+        <div class="listitem" onclick="pickCustomer('Victor Farms — 9447000003')">
+          <div class="title">Victor Farms</div>
+          <div class="small">Alias: Victor Estate / KVR · Machines: MS460, FS120</div>
+        </div>
+        <div class="listitem" onclick="pickCustomer('Jose Sawmill — 9447000004')">
+          <div class="title">Jose Sawmill</div>
+          <div class="small">Alias: Saw mill Jose · Machines: MS250, SR450</div>
+        </div>
+      </div>
+
+      <label>Machine</label>
+      <select>
+        <option>MS460 — Serial 11258975355</option>
+        <option>FS120 — Serial 8877001122</option>
+        <option>New machine / serial unknown</option>
+      </select>
+
+      <label>Customer wants</label>
+      <div class="grid2">
+        <button class="btn" onclick="toggle(this)">Won't start</button>
+        <button class="btn" onclick="toggle(this)">Service</button>
+        <button class="btn" onclick="toggle(this)">Fuel leak</button>
+        <button class="btn" onclick="toggle(this)">No power</button>
+        <button class="btn" onclick="toggle(this)">Chain problem</button>
+        <button class="btn" onclick="toggle(this)">Other</button>
+      </div>
+      <label>Optional comment</label>
+      <textarea placeholder="What customer said"></textarea>
+
+      <button class="btn primary block" style="margin-top:14px" onclick="receive()">Receive machine</button>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="queue" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>Service Centre Queue</h2><span class="pill">Status by action</span></div>
+    <div class="content">
+      <input placeholder="Search phone, alias, model, serial, work order">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button class="btn primary">Waiting to begin</button>
+        <button class="btn">Observed</button>
+        <button class="btn">Estimate ready</button>
+        <button class="btn">Work in progress</button>
+        <button class="btn">On hold</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="listitem">
+    <div class="title">Victor Farms — MS460 <span class="pill">Waiting to begin</span></div>
+    <div class="small">KVR/2606/014 · Received 09:12 by Rajeev · Customer wants: Fuel leak / service</div>
+    <div style="margin-top:12px"><button class="btn primary" onclick="openJob()">Open job</button></div>
+  </div>
+
+  <div class="listitem">
+    <div class="title">Jose Sawmill — FS120 <span class="pill amber">Work on hold</span></div>
+    <div class="small">Waiting parts · Expected Friday · Manager review required</div>
+    <div style="margin-top:12px"><button class="btn" onclick="openJob()">Open job</button></div>
+  </div>
+</main>
+</section>
+
+<section id="job" class="screen">
+<main>
+  <div class="card">
+    <div class="content">
+      <div class="hero">Victor Farms — MS460</div>
+      <div class="sub">KVR/2606/014 · Serial 11258975355 · Staff: Rajeev · Mechanic: John Victor</div>
+      <div class="status-strip">
+        <span class="stage done">Received</span>
+        <span class="stage active" id="stageObserve">Observation</span>
+        <span class="stage" id="stageEstimate">Estimate</span>
+        <span class="stage" id="stageApprove">Approval</span>
+        <span class="stage" id="stageWork">Work</span>
+        <span class="stage" id="stageTest">Test</span>
+        <span class="stage" id="stageReady">Ready</span>
+        <span class="stage" id="stageDelivered">Delivered</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="panelObservation">
+    <div class="card-head"><h2>Next Input — Observation</h2></div>
+    <div class="content">
+      <label>Technician observation</label>
+      <textarea placeholder="What is seen after checking machine"></textarea>
+      <label>Photos / remarks</label>
+      <input type="file" accept="image/*">
+      <button class="btn primary block" style="margin-top:14px" onclick="stepEstimate()">Observation complete</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="panelEstimate">
+    <div class="card-head"><h2>Estimate</h2><span class="pill amber">Edits logged</span></div>
+    <div class="content">
+      <label>Parts required</label>
+      <div class="listitem">
+        <div class="title">Clutch Assembly <span class="pill green">Stock 2</span></div>
+        <div class="small">₹850 · Even if stock exists, staff can raise indent.</div>
+        <button class="btn" onclick="raiseIndent('Clutch Assembly')">Raise indent</button>
+      </div>
+      <div class="listitem">
+        <div class="title">Carburetor Kit <span class="pill amber">Low stock</span></div>
+        <div class="small">₹620 · Minimum 5, branch stock 1.</div>
+        <button class="btn" onclick="raiseIndent('Carburetor Kit')">Raise indent</button>
+      </div>
+      <label>Labour</label>
+      <input value="Full Service — ₹3000">
+      <label>Auto estimate</label>
+      <input value="₹4,470">
+      <button class="btn primary block" style="margin-top:14px" onclick="stepApproval()">Estimate ready</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="panelApproval">
+    <div class="card-head"><h2>Customer Approval</h2></div>
+    <div class="content">
+      <p class="sub">Customer acknowledgement records that work can begin. Confirmation goes to customer, manager, and mechanic.</p>
+      <div class="grid2">
+        <button class="btn green" onclick="stepWork()">Customer approved</button>
+        <button class="btn red">Rejected / modify</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="panelWork">
+    <div class="card-head"><h2>Work In Progress</h2><span class="pill green">Timer started</span></div>
+    <div class="content">
+      <div class="grid2">
+        <button class="btn primary" onclick="alert('Part photo attached to job')">📷 Part photo</button>
+        <button class="btn" onclick="raiseIndent('Extra part')">Raise PO / indent</button>
+        <button class="btn" onclick="alert('Comment added')">Add comment</button>
+        <button class="btn" onclick="alert('Query posted to manager')">Ask query</button>
+      </div>
+      <label>Parts actually used</label>
+      <textarea placeholder="Enter parts or photograph packing / part"></textarea>
+      <label>Work note</label>
+      <textarea placeholder="Work done"></textarea>
+      <div class="grid2" style="margin-top:14px">
+        <button class="btn red" onclick="showHold()">Work on hold</button>
+        <button class="btn green" onclick="stepTest()">Work complete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="panelHold">
+    <div class="card-head"><h2>Work On Hold</h2></div>
+    <div class="content">
+      <label>Reason required</label>
+      <select>
+        <option>Waiting parts</option>
+        <option>Customer approval pending</option>
+        <option>Outside work</option>
+        <option>Technician unavailable</option>
+        <option>Other</option>
+      </select>
+      <label>Expected date</label>
+      <input type="date">
+      <button class="btn primary block" style="margin-top:14px" onclick="alert('Hold recorded. Manager dashboard updated.')">Save hold reason</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="panelTest">
+    <div class="card-head"><h2>Test / Quality Check</h2></div>
+    <div class="content">
+      <div class="grid2">
+        <button class="btn" onclick="toggle(this)">Starts</button>
+        <button class="btn" onclick="toggle(this)">Idle OK</button>
+        <button class="btn" onclick="toggle(this)">No leak</button>
+        <button class="btn" onclick="toggle(this)">Cleaned</button>
+      </div>
+      <button class="btn green block" style="margin-top:14px" onclick="stepReady()">Ready for delivery</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="panelReady">
+    <div class="card-head"><h2>Ready For Delivery</h2></div>
+    <div class="content">
+      <p class="sub">Owner view gets completed machine. Customer intimation can be sent after decided period with bill copy and work summary.</p>
+      <div class="grid2">
+        <button class="btn" onclick="alert('Customer message queued')">Notify customer</button>
+        <button class="btn primary" onclick="show('ready')">Go delivery list</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Machine Timeline</h2><span class="pill">Auto</span></div>
+    <div class="content timeline" id="timeline">
+      <div class="event"><div class="time">09:12</div><div><b>Received</b><div class="small">By Rajeev at KVR</div></div></div>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="ready" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>Ready / Delivery</h2></div>
+    <div class="content">
+      <div class="listitem">
+        <div class="title">MS460 — Victor Farms <span class="pill green">Ready</span></div>
+        <div class="small">Bill copy pending / customer intimation due</div>
+        <div style="margin-top:12px" class="grid2">
+          <button class="btn">Send bill copy</button>
+          <button class="btn green" onclick="alert('Delivered. Timeline closed.')">Delivered</button>
+        </div>
+      </div>
+      <div class="listitem">
+        <div class="title">BR600 — Joseph <span class="pill amber">Ready 5 days</span></div>
+        <div class="small">Reminder due. Manager and owner visibility.</div>
+      </div>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="purchase" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>Indent / PO Requests</h2><span class="pill">Request ≠ purchase decision</span></div>
+    <div class="content">
+      <p class="sub">Staff can raise an indent on the spot even if stock is available or low. Manager/owner decides buy, transfer, or ignore.</p>
+      <div id="indentList">
+        <div class="listitem"><div class="title">Carburetor Kit <span class="pill">KVR</span></div><div class="small">Low stock · Qty 2 · Suggested: Check MDM</div></div>
+        <div class="listitem"><div class="title">SR450 Hose <span class="pill amber">MDM</span></div><div class="small">No stock · Qty 3 · Urgent</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="daily" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>Daily Machine List</h2><span class="pill">Manager review</span></div>
+    <div class="content">
+      <div class="grid3">
+        <div class="stat"><b>14</b><span>Open</span></div>
+        <div class="stat"><b>4</b><span>WIP</span></div>
+        <div class="stat"><b>3</b><span>Ready</span></div>
+      </div>
+      <div class="listitem" style="margin-top:14px"><div class="title">Machines waiting to begin <span class="pill amber">5</span></div></div>
+      <div class="listitem"><div class="title">Work on hold <span class="pill red">2</span></div></div>
+      <div class="listitem"><div class="title">Complete not collected <span class="pill amber">3</span></div></div>
+      <button class="btn green block">Manager reviewed today</button>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="exceptions" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>Daily Exceptions</h2><span class="pill red">Owner visible</span></div>
+    <div class="content">
+      <div class="listitem"><div class="title">Missing serial number <span class="pill red">4</span></div><div class="small">Must be corrected daily.</div></div>
+      <div class="listitem"><div class="title">Estimate edited after approval <span class="pill amber">1</span></div><div class="small">Edit history preserved.</div></div>
+      <div class="listitem"><div class="title">Work started but not complete <span class="pill amber">4</span></div></div>
+      <div class="listitem"><div class="title">PO raised but not reviewed <span class="pill red">5</span></div></div>
+    </div>
+  </div>
+</main>
+</section>
+
+<section id="more" class="screen">
+<main>
+  <div class="card">
+    <div class="card-head"><h2>More</h2></div>
+    <div class="content grid2">
+      <button class="btn" onclick="show('daily')">Daily Review</button>
+      <button class="btn" onclick="show('exceptions')">Exceptions</button>
+      <button class="btn">Workshop Feed</button>
+      <button class="btn">Knowledge</button>
+      <button class="btn">Links</button>
+      <button class="btn red" onclick="location.reload()">Logout</button>
+    </div>
+  </div>
+</main>
+</section>
+
+<nav class="bottomnav">
+  <a href="#" class="navbtn active" data-nav="home" onclick="show('home')"><b>🏠</b>Home</a>
+  <a href="#" class="navbtn" data-nav="receive" onclick="show('receive')"><b>➕</b>Receive</a>
+  <a href="#" class="navbtn" data-nav="queue" onclick="show('queue')"><b>🔧</b>Work</a>
+  <a href="#" class="navbtn" data-nav="purchase" onclick="show('purchase')"><b>📦</b>Indent</a>
+  <a href="#" class="navbtn" data-nav="more" onclick="show('more')"><b>☰</b>More</a>
 </nav>
+
+<button class="feedback" onclick="openFeedback()">💡 അഭിപ്രായം</button>
+</div>
+
+<div id="feedbackModal" class="modal">
+  <div class="sheet">
+    <h2 style="margin-top:0">അഭിപ്രായം പറയൂ</h2>
+    <p class="sub">Simple choices മതി. ഇത് testing prototype ആണ്.</p>
+    <label>ഇത് പേപ്പറിനേക്കാൾ എളുപ്പമാണോ?</label>
+    <div class="rategrid">
+      <div class="rate">😊<br>അതെ</div>
+      <div class="rate">😐<br>ഒരുപോലെ</div>
+      <div class="rate">😕<br>ഇല്ല</div>
+    </div>
+    <label>എവിടെയാണ് ബുദ്ധിമുട്ട്?</label>
+    <div class="choicegrid">
+      <div class="choice">Customer</div>
+      <div class="choice">Machine</div>
+      <div class="choice">Repair stage</div>
+      <div class="choice">Parts / Indent</div>
+      <div class="choice">Navigation</div>
+      <div class="choice">Other</div>
+    </div>
+    <label>ഒരു മാറ്റം മാത്രം</label>
+    <textarea placeholder="Malayalam / English / Manglish"></textarea>
+    <div class="grid2" style="margin-top:14px">
+      <button class="btn" onclick="closeFeedback()">Close</button>
+      <button class="btn primary" onclick="closeFeedback();alert('നന്ദി. Real feedback saving can be added later.')">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PEOPLE={
+  KVR:["Vishnu (Manager)","Rajeev","Anandu","Thankachan"],
+  MDM:["Ratheesh (Manager)","John Victor"],
+  PKM:["Anoop K P (Manager)","Anoop P G"],
+  SKT:["Karthick (Manager)","Mahalakshmi","Jothi"],
+  NDD:["Yedhu (Manager)"]
+};
+let branch="KVR", staff="Rajeev", demo=false;
+
+function loadUsers(){
+  const b=document.getElementById("loginBranch").value;
+  const u=document.getElementById("loginUser");
+  u.innerHTML="";
+  (PEOPLE[b]||[]).forEach(name=>{
+    const opt=document.createElement("option");
+    opt.value=name; opt.textContent=name;
+    u.appendChild(opt);
+  });
+}
+function login(isDemo){
+  demo=isDemo;
+  branch=isDemo?"DEMO":document.getElementById("loginBranch").value;
+  staff=isDemo?"Demo":document.getElementById("loginUser").value;
+  document.getElementById("login").classList.remove("active");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("branchBadge").textContent=branch;
+  document.getElementById("userBadge").textContent=staff.replace(" (Manager)","");
+  document.getElementById("demoBanner").classList.toggle("hidden",!demo);
+  show("home");
+}
+function show(id){
+  document.querySelectorAll("#app .screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  const map={home:"home",receive:"receive",queue:"queue",job:"queue",ready:"queue",purchase:"purchase",daily:"more",exceptions:"more",more:"more"};
+  document.querySelectorAll(".navbtn").forEach(n=>n.classList.remove("active"));
+  const n=document.querySelector(`[data-nav="${map[id]||"home"}"]`);
+  if(n)n.classList.add("active");
+  window.scrollTo(0,0);
+}
+function showSuggestions(){document.getElementById("customerSuggestions").classList.remove("hidden")}
+function pickCustomer(text){
+  document.getElementById("custSearch").value=text;
+  document.getElementById("customerSuggestions").classList.add("hidden");
+}
+function toggle(btn){btn.classList.toggle("primary")}
+function receive(){
+  alert("Status: RECEIVED. Machine moved to Service Centre Queue.");
+  show("queue");
+}
+function openJob(){show("job")}
+function addTimeline(title,desc){
+  const now=new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  const div=document.createElement("div");
+  div.className="event";
+  div.innerHTML=`<div class="time">${now}</div><div><b>${title}</b><div class="small">${desc}</div></div>`;
+  document.getElementById("timeline").appendChild(div);
+}
+function panel(id){
+  ["panelObservation","panelEstimate","panelApproval","panelWork","panelHold","panelTest","panelReady"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+function setStage(active){
+  const ids=["stageObserve","stageEstimate","stageApprove","stageWork","stageTest","stageReady","stageDelivered"];
+  const order={observe:0,estimate:1,approve:2,work:3,test:4,ready:5,delivered:6}[active];
+  ids.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.className="stage";
+    if(i<order)el.classList.add("done");
+    if(i===order)el.classList.add("active");
+  });
+}
+function stepEstimate(){setStage("estimate");panel("panelEstimate");addTimeline("Observation complete","Status changed to OBSERVED")}
+function stepApproval(){setStage("approve");panel("panelApproval");addTimeline("Estimate ready","Auto estimate prepared. Manual edits logged.")}
+function stepWork(){setStage("work");panel("panelWork");addTimeline("Customer approved","Confirmation sent. Work can begin. Timer started.")}
+function showHold(){panel("panelHold");addTimeline("Work on hold","Reason required. Manager review triggered.")}
+function stepTest(){setStage("test");panel("panelTest");addTimeline("Work complete","Mechanic marked work complete. Test required.")}
+function stepReady(){setStage("ready");panel("panelReady");addTimeline("Ready for delivery","Owner view updated. Customer notification queue available.")}
+function raiseIndent(part){
+  const row=document.createElement("div");
+  row.className="listitem";
+  row.innerHTML=`<div class="title">${part} <span class="pill">${branch}</span></div><div class="small">Raised from active job by ${staff.replace(" (Manager)","")} · Manager decides transfer/buy/ignore.</div>`;
+  const list=document.getElementById("indentList");
+  if(list)list.prepend(row);
+  alert("Indent raised. This is only a request; purchase decision is separate.");
+}
+function openFeedback(){document.getElementById("feedbackModal").classList.add("open")}
+function closeFeedback(){document.getElementById("feedbackModal").classList.remove("open")}
+loadUsers();
+</script>
 </body>
 </html>
