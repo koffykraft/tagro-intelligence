@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAGRO Service Centre - Navigation Prototype</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;margin:0;background:#f5f5f5;color:#222;padding-bottom:90px}
+header{position:sticky;top:0;background:#fff;padding:14px 18px;border-bottom:1px solid #ddd;display:flex;align-items:center}
+.logo{font-size:32px;font-weight:900;font-style:italic;color:#111;text-decoration:none}
+.logo:before{content:"";display:inline-block;width:24px;height:10px;background:#d9652f;transform:skew(-20deg);margin-right:8px}
+.badge{margin-left:10px;background:#d9652f;color:#fff;padding:6px 10px;border-radius:8px;font-weight:700}
+.user{margin-left:auto;color:#d9652f;font-weight:700}
+main{padding:16px;max-width:760px;margin:auto}
+.card{background:#fff;border:1px solid #ddd;border-radius:16px;padding:18px;margin-bottom:16px}
+h2{margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:block;text-align:center;text-decoration:none;padding:14px;border-radius:12px;border:1px solid #ddd;background:#fff;color:#111;font-weight:700}
+.primary{background:#d9652f;color:#fff;border-color:#d9652f}
+.stage{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.stage span{padding:8px 12px;border-radius:999px;border:1px solid #ccc}
+.done{background:#e8f5ea;color:#246b35}
+.active{background:#d9652f;color:#fff;border-color:#d9652f}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr)}
+.bottom a{padding:10px;text-align:center;text-decoration:none;color:#666;font-size:12px}
+.bottom b{display:block;font-size:22px}
+#feedback{position:fixed;right:16px;bottom:82px;background:#111;color:#fff;padding:12px 16px;border-radius:30px;text-decoration:none}
+textarea,input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;box-sizing:border-box}
+#sheet{display:none;position:fixed;inset:0;background:#0006}
+#panel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:18px;max-height:85%;overflow:auto}
+</style>
+</head>
+<body>
+<header>
+<a href="#" class="logo">TAGRO</a><span class="badge">DEMO</span><span class="user">Demo</span>
+</header>
+<main>
+<div class="card">
+<h2>🏠 Home</h2>
+<p>Prototype for navigation testing.</p>
+<div class="grid">
+<a class="btn primary" href="#receive">➕ Receive Machine</a>
+<a class="btn" href="#workshop">🔧 Workshop</a>
+<a class="btn" href="#purchase">📦 Purchase</a>
+<a class="btn" href="#reports">📊 Reports</a>
+</div>
+</div>
+
+<div id="receive" class="card">
+<h2>Quick Receive</h2>
+<input placeholder="Customer / Phone / Alias">
+<select><option>MS460</option><option>FS120</option><option>+ New Machine</option></select>
+<textarea placeholder="Complaint"></textarea>
+<p><a class="btn primary" href="#workshop">Receive Machine</a></p>
+</div>
+
+<div id="workshop" class="card">
+<h2>Workshop Queue</h2>
+<p><b>Victor Farms - MS460</b></p>
+<div class="stage">
+<span class="done">Received</span>
+<span class="active">Repair</span>
+<span>Test</span>
+<span>Ready</span>
+<span>Delivered</span>
+</div>
+<div class="grid">
+<a class="btn" href="#purchase">Raise PO</a>
+<a class="btn primary" href="#reports">Repair Complete</a>
+</div>
+</div>
+
+<div id="purchase" class="card">
+<h2>PO / Indent</h2>
+<p>Even if stock is available, staff can raise an indent.</p>
+<ul>
+<li>Clutch Assembly - Qty 2</li>
+<li>Carburettor Kit - Low Stock</li>
+</ul>
+</div>
+
+<div id="reports" class="card">
+<h2>Reports</h2>
+<p>Today's Jobs: 12</p>
+<p>Pending PO: 5</p>
+</div>
+</main>
+
+<a id="feedback" href="#" onclick="document.getElementById('sheet').style.display='block';return false;">💡 അഭിപ്രായം</a>
+
+<div id="sheet">
+<div id="panel">
+<h2>Malayalam Feedback</h2>
+<p>ഇത് പേപ്പറിനേക്കാൾ എളുപ്പമാണോ?</p>
+<label><input type="radio" name="r"> അതെ</label><br>
+<label><input type="radio" name="r"> ഒരുപോലെ</label><br>
+<label><input type="radio" name="r"> ഇല്ല</label>
+<p>ഒരു മാറ്റം മാത്രം പറയൂ</p>
+<textarea placeholder="Comment"></textarea>
+<p><a class="btn primary" href="#" onclick="document.getElementById('sheet').style.display='none';return false;">Submit</a></p>
+</div>
+</div>
+
+<nav class="bottom">
+<a href="#"><b>🏠</b>Home</a>
+<a href="#receive"><b>➕</b>Receive</a>
+<a href="#workshop"><b>🔧</b>Workshop</a>
+<a href="#purchase"><b>📦</b>PO</a>
+<a href="#reports"><b>☰</b>More</a>
+</nav>
+</body>
+</html>
