@@ -9,7 +9,7 @@
   --bg: #f4f2ef;
   --card: #ffffff;
   --line: #ded8d2;
-  --muted: #555555; /* Darkened from #777 for better readability */
+  --muted: #555555; /* Darkened for accessibility/contrast */
 
   /* Semantic Status Colors */
   --green: #2f7d3d;
@@ -28,9 +28,7 @@
 /* ==========================================================================
    2. Resets & Base Styles
    ========================================================================== */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -40,207 +38,87 @@ body {
   padding-bottom: 88px; /* Accounts for bottom nav */
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-button, input, select, textarea {
-  font-family: var(--font);
-}
-
-.hidden {
-  display: none !important;
-}
+a { text-decoration: none; color: inherit; }
+button, input, select, textarea { font-family: var(--font); }
+.hidden { display: none !important; }
 
 /* ==========================================================================
    3. Layout & Navigation
    ========================================================================== */
 .shell-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: #fff;
+  position: sticky; top: 0; z-index: 20; background: #fff;
   border-bottom: 1px solid var(--line);
   padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
 }
-
-.logo img {
-  height: 42px;
-  display: block;
-}
-
-main {
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 14px;
-}
+.logo img { height: 42px; display: block; }
+main { max-width: 820px; margin: 0 auto; padding: 14px; }
 
 .bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 30;
-  background: #fff;
-  border-top: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 3px;
-  /* Respects mobile safe areas (home indicator) */
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  background: #fff; border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;
   padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
 }
 
 /* ==========================================================================
    4. Grid Systems
    ========================================================================== */
-.grid2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.grid3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
 /* ==========================================================================
    5. Cards & Containers
    ========================================================================== */
 .card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  margin-bottom: 14px;
-  overflow: hidden;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 20px; margin-bottom: 14px; overflow: hidden;
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
 }
-
 .card-head {
-  padding: 14px 16px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  padding: 14px 16px; border-bottom: 1px solid #eee;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
-
 .card-head h2 {
-  margin: 0;
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: var(--muted);
-  text-transform: uppercase;
+  margin: 0; font-size: 13px; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
 }
-
-.body {
-  padding: 16px;
-}
+.body { padding: 16px; }
 
 .list {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 17px;
-  padding: 14px;
-  margin-bottom: 10px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 17px; padding: 14px; margin-bottom: 10px;
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
 
 /* ==========================================================================
    6. Typography & Micro-components
    ========================================================================== */
-.hero {
-  font-size: 26px;
-  font-weight: 950;
-  letter-spacing: -0.3px;
-  margin-bottom: 6px;
-}
-
-.sub {
-  color: var(--muted);
-  line-height: 1.45;
-  font-size: 15px;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: 950;
-}
-
-.small {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
-  line-height: 1.45;
-}
+.hero { font-size: 26px; font-weight: 950; letter-spacing: -0.3px; margin-bottom: 6px; }
+.sub { color: var(--muted); line-height: 1.45; font-size: 15px; }
+.title { font-size: 18px; font-weight: 950; }
+.small { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
 
 .notice {
-  border-left: 5px solid var(--orange);
-  background: #fff7f1;
-  border-radius: 14px;
-  padding: 12px 13px;
-  color: #6f381d;
-  font-weight: 850;
-  line-height: 1.45;
+  border-left: 5px solid var(--orange); background: #fff7f1;
+  border-radius: 14px; padding: 12px 13px; color: #6f381d;
+  font-weight: 850; line-height: 1.45;
 }
 
 .stat {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 13px;
-  text-align: center;
+  background: #fff; border: 1px solid var(--line); border-radius: 18px;
+  padding: 13px; text-align: center;
 }
-
-.stat b {
-  display: block;
-  font-size: 26px;
-  line-height: 1;
-  font-weight: 950;
-}
-
-.stat span {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--muted);
-  letter-spacing: 0.5px;
-  font-weight: 950;
-}
+.stat b { display: block; font-size: 26px; line-height: 1; font-weight: 950; }
+.stat span { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; font-weight: 950; }
 
 /* Pills & Badges */
-.branch-pill {
-  background: var(--orange);
-  color: #fff;
-  border-radius: 10px;
-  padding: 7px 10px;
-  font-weight: 950;
-  font-size: 13px;
-}
-
-.user-pill {
-  margin-left: auto;
-  color: var(--orange);
-  font-weight: 950;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
+.branch-pill { background: var(--orange); color: #fff; border-radius: 10px; padding: 7px 10px; font-weight: 950; font-size: 13px; }
+.user-pill { margin-left: auto; color: var(--orange); font-weight: 950; font-size: 13px; white-space: nowrap; }
 .pill {
-  display: inline-block;
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 950;
-  background: #fff0e8;
-  color: var(--orange);
-  white-space: nowrap;
+  display: inline-block; border-radius: 999px; padding: 4px 8px;
+  font-size: 12px; font-weight: 950; background: #fff0e8; color: var(--orange); white-space: nowrap;
 }
-
 .pill.green { background: var(--green-soft); color: var(--green); }
 .pill.amber { background: var(--amber-soft); color: var(--amber); }
 .pill.red { background: var(--red-soft); color: var(--red); }
@@ -249,7 +127,104 @@ main {
    7. Buttons & Navigation Items
    ========================================================================== */
 .btn {
-  border: 1px solid var(--line);
-  background: #fff;
-  border-radius: 16px;
-  padding: 1
+  border: 1px solid var(--line); background: #fff; border-radius: 16px;
+  padding: 13px 14px; min-height: 54px; font-size: 15px; font-weight: 950;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  text-align: center; cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease;
+}
+
+.btn.primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+.btn.green { background: var(--green); border-color: var(--green); color: #fff; }
+.btn.red { color: var(--red); border-color: #e8bbb6; }
+.btn.soft { background: var(--orange-soft); border-color: #f0c7b7; color: var(--orange); }
+.btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; }
+.btn.block { width: 100%; }
+
+.navbtn {
+  text-align: center; color: var(--muted); font-weight: 950;
+  font-size: 11px; border-radius: 13px; padding: 6px 2px;
+}
+.navbtn b { display: block; font-size: 21px; margin-bottom: 2px; }
+.navbtn.active { background: var(--orange-soft); color: var(--orange); }
+
+/* ==========================================================================
+   8. Forms & Inputs
+   ========================================================================== */
+label {
+  display: block; margin: 14px 0 6px; font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted); font-weight: 950;
+}
+input, select, textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: 15px;
+  padding: 13px; font-size: 17px; background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--orange-soft);
+}
+textarea { min-height: 88px; resize: vertical; }
+
+.form-panel {
+  display: none; margin-top: 12px; border: 1px solid var(--line);
+  border-radius: 17px; padding: 14px; background: #fff;
+}
+.form-panel.show { display: block; }
+.search-results { display: none; margin-top: 10px; }
+.search-results.show { display: block; }
+
+/* ==========================================================================
+   9. Specialty Layouts (Splash, Login, Stage, Voice)
+   ========================================================================== */
+/* Splash Screen */
+.splash-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+.spinner {
+  width: 28px; height: 28px; border: 3px solid var(--line);
+  border-top-color: var(--orange); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 24px auto 16px;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Login */
+.login-wrap { max-width: 520px; margin: 0 auto; padding: 38px 18px; }
+.login-logo { text-align: center; margin: 38px 0 10px; }
+.login-logo img { height: 76px; max-width: 92%; }
+
+/* Job Stages */
+.stage-strip { display: flex; gap: 6px; overflow: auto; padding: 8px 0 4px; }
+.stage { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 950; color: var(--muted); }
+.stage.done { background: var(--green-soft); border-color: #bee1c6; color: var(--green); }
+.stage.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+.workbench-current { border: 2px solid var(--orange); background: #fffaf6; }
+
+/* Pause Panel Buttons */
+.pause-type {
+  background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  padding: 13px; font-weight: 950; text-align: left; cursor: pointer;
+}
+.pause-type.selected { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+/* Voice UI */
+.voice { border: 2px dashed #d9c6bc; background: #fffaf7; border-radius: 18px; padding: 16px; text-align: center; margin-bottom: 12px; }
+.voice.mic { font-size: 36px; }
+
+/* ==========================================================================
+   10. Interactive States
+   ========================================================================== */
+.list.click { cursor: pointer; }
+.list.click:active, .btn:active, .pause-type:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   11. Mobile Responsiveness
+   ========================================================================== */
+/* Triggers only on unusually narrow phones (e.g., iPhone SE v1, older Androids) */
+@media(max-width: 360px) {
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+  .hero { font-size: 23px; }
+  .logo img { height: 37px; }
+}
