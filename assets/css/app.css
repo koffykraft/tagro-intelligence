@@ -1,87 +1,255 @@
-:root{
-  --orange:#d9652f;
-  --orange-soft:#fff4ef;
-  --charcoal:#161616;
-  --bg:#f4f2ef;
-  --card:#ffffff;
-  --line:#ded8d2;
-  --muted:#747474;
-  --green:#2f7d3d;
-  --green-soft:#eaf6ed;
-  --amber:#a46900;
-  --amber-soft:#fff5d8;
-  --red:#b9473d;
-  --red-soft:#fdebea;
-  --blue:#2e6fd8;
-  --blue-soft:#edf4ff;
-  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Noto Sans Malayalam",sans-serif;
+/* ==========================================================================
+   1. Design Tokens & Variables
+   ========================================================================== */
+:root {
+  /* Brand & Neutrals */
+  --orange: #d9652f;
+  --orange-soft: #fff4ef;
+  --charcoal: #161616;
+  --bg: #f4f2ef;
+  --card: #ffffff;
+  --line: #ded8d2;
+  --muted: #555555; /* Darkened from #777 for better readability */
+
+  /* Semantic Status Colors */
+  --green: #2f7d3d;
+  --green-soft: #eaf6ed;
+  --amber: #a46900;
+  --amber-soft: #fff5d8;
+  --red: #b9473d;
+  --red-soft: #fdebea;
+  --blue: #2e6fd8;
+  --blue-soft: #edf4ff;
+
+  /* Typography */
+  --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "Noto Sans Malayalam", sans-serif;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font);padding-bottom:88px}
-a{text-decoration:none;color:inherit}
-button,input,select,textarea{font-family:var(--font)}
-.hidden{display:none!important}
-.shell-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:10px}
-.logo img{height:42px;display:block}
-.branch-pill{background:var(--orange);color:#fff;border-radius:10px;padding:7px 10px;font-weight:950;font-size:13px}
-.user-pill{margin-left:auto;color:var(--orange);font-weight:950;font-size:13px;white-space:nowrap}
-main{max-width:820px;margin:0 auto;padding:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;margin-bottom:14px;overflow:hidden;box-shadow:0 5px 18px rgba(0,0,0,.05)}
-.card-head{padding:14px 16px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.card-head h2{margin:0;font-size:13px;letter-spacing:2px;color:#777;text-transform:uppercase}
-.body{padding:16px}
-.hero{font-size:26px;font-weight:950;letter-spacing:-.3px;margin-bottom:6px}
-.sub{color:var(--muted);line-height:1.45;font-size:15px}
-.notice{border-left:5px solid var(--orange);background:#fff7f1;border-radius:14px;padding:12px 13px;color:#6f381d;font-weight:850;line-height:1.45}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.btn{border:1px solid var(--line);background:#fff;border-radius:16px;padding:13px 14px;min-height:54px;font-size:15px;font-weight:950;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;cursor:pointer}
-.btn.primary{background:var(--orange);border-color:var(--orange);color:#fff}
-.btn.green{background:var(--green);border-color:var(--green);color:#fff}
-.btn.red{color:var(--red);border-color:#e8bbb6}
-.btn.soft{background:var(--orange-soft);border-color:#f0c7b7;color:var(--orange)}
-.btn.selected{background:var(--orange);border-color:var(--orange);color:#fff}
-.btn.block{width:100%}
-label{display:block;margin:14px 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#777;font-weight:950}
-input,select,textarea{width:100%;border:1px solid var(--line);border-radius:15px;padding:13px;font-size:17px;background:#fff}
-textarea{min-height:88px;resize:vertical}
-.list{background:#fff;border:1px solid var(--line);border-radius:17px;padding:14px;margin-bottom:10px}
-.list.click{cursor:pointer}
-.list.click:active,.btn:active{transform:scale(.99);opacity:.9}
-.title{font-size:18px;font-weight:950}
-.small{font-size:13px;color:#777;margin-top:4px;line-height:1.45}
-.pill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;background:#fff0e8;color:var(--orange);white-space:nowrap}
-.pill.green{background:var(--green-soft);color:var(--green)}
-.pill.amber{background:var(--amber-soft);color:var(--amber)}
-.pill.red{background:var(--red-soft);color:var(--red)}
-.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;text-align:center}
-.stat b{display:block;font-size:26px;line-height:1;font-weight:950}
-.stat span{font-size:11px;text-transform:uppercase;color:#777;letter-spacing:.5px;font-weight:950}
-.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
-.navbtn{text-align:center;color:#777;font-weight:950;font-size:11px;border-radius:13px;padding:6px 2px}
-.navbtn b{display:block;font-size:21px;margin-bottom:2px}
-.navbtn.active{background:var(--orange-soft);color:var(--orange)}
-.login-wrap{max-width:520px;margin:0 auto;padding:38px 18px}
-.login-logo{text-align:center;margin:38px 0 10px}
-.login-logo img{height:76px;max-width:92%}
-.form-panel{display:none;margin-top:12px;border:1px solid var(--line);border-radius:17px;padding:14px;background:#fff}
-.form-panel.show{display:block}
-.search-results{display:none;margin-top:10px}
-.search-results.show{display:block}
-.stage-strip{display:flex;gap:6px;overflow:auto;padding:8px 0 4px}
-.stage{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:950;color:#777}
-.stage.done{background:var(--green-soft);border-color:#bee1c6;color:var(--green)}
-.stage.active{background:var(--orange);border-color:var(--orange);color:#fff}
-.workbench-current{border:2px solid var(--orange);background:#fffaf6}
-.pause-type{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;font-weight:950;text-align:left;cursor:pointer}
-.pause-type.selected{background:var(--orange);color:#fff;border-color:var(--orange)}
-.mode-bar{display:flex;gap:8px;overflow:auto;margin:10px 0}
-.mode-chip{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;font-weight:950;color:#777;white-space:nowrap}
-.mode-chip.active{background:var(--orange);color:#fff;border-color:var(--orange)}
-.voice{border:2px dashed #d9c6bc;background:#fffaf7;border-radius:18px;padding:16px;text-align:center}
-.voice.mic{font-size:36px}
-@media(max-width:440px){
- .grid2,.grid3{grid-template-columns:1fr}
- .hero{font-size:23px}
- .logo img{height:37px}
+
+/* ==========================================================================
+   2. Resets & Base Styles
+   ========================================================================== */
+* {
+  box-sizing: border-box;
 }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--charcoal);
+  font-family: var(--font);
+  padding-bottom: 88px; /* Accounts for bottom nav */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button, input, select, textarea {
+  font-family: var(--font);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   3. Layout & Navigation
+   ========================================================================== */
+.shell-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  height: 42px;
+  display: block;
+}
+
+main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+  /* Respects mobile safe areas (home indicator) */
+  padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   4. Grid Systems
+   ========================================================================== */
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* ==========================================================================
+   5. Cards & Containers
+   ========================================================================== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+}
+
+.card-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.body {
+  padding: 16px;
+}
+
+.list {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 14px;
+  margin-bottom: 10px;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+/* ==========================================================================
+   6. Typography & Micro-components
+   ========================================================================== */
+.hero {
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.sub {
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 15px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.small {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.notice {
+  border-left: 5px solid var(--orange);
+  background: #fff7f1;
+  border-radius: 14px;
+  padding: 12px 13px;
+  color: #6f381d;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.stat {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 13px;
+  text-align: center;
+}
+
+.stat b {
+  display: block;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.stat span {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  font-weight: 950;
+}
+
+/* Pills & Badges */
+.branch-pill {
+  background: var(--orange);
+  color: #fff;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-weight: 950;
+  font-size: 13px;
+}
+
+.user-pill {
+  margin-left: auto;
+  color: var(--orange);
+  font-weight: 950;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 950;
+  background: #fff0e8;
+  color: var(--orange);
+  white-space: nowrap;
+}
+
+.pill.green { background: var(--green-soft); color: var(--green); }
+.pill.amber { background: var(--amber-soft); color: var(--amber); }
+.pill.red { background: var(--red-soft); color: var(--red); }
+
+/* ==========================================================================
+   7. Buttons & Navigation Items
+   ========================================================================== */
+.btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 16px;
+  padding: 1
