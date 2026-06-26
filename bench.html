@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Bench</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body data-page="bench">
+<header class="shell-header">
+  <a class="logo" href="home.html"><img src="assets/images/tagro-logo.png" alt="TAGRO"></a>
+  <span class="branch-pill" id="branchBadge">KVR</span>
+  <span class="user-pill" id="userBadge">Staff</span>
+</header>
+
+<main>
+  <div class="card">
+    <div class="body">
+      <div class="hero">My Bench</div>
+      <div class="sub">Protect concentration. One current machine. Everything else waits clearly.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Current work</h2><span class="pill">Resume first</span></div>
+    <div class="body" id="currentJob"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Paused / waiting</h2><span class="pill amber">not forgotten</span></div>
+    <div class="body" id="pausedJobs"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Waiting inspection</h2><span class="pill">small window</span></div>
+    <div class="body" id="waitingJobs"></div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <a class="navbtn" data-nav="home" href="home.html"><b>🏠</b>Home</a>
+  <a class="navbtn" data-nav="receive" href="receive.html"><b>➕</b>Receive</a>
+  <a class="navbtn" data-nav="bench" href="bench.html"><b>🔧</b>Bench</a>
+  <a class="navbtn" data-nav="work" href="work.html"><b>▶</b>Work</a>
+  <a class="navbtn" data-nav="more" href="#" onclick="logout()"><b>☰</b>Logout</a>
+</nav>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
