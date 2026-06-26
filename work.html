@@ -1,14 +1,16 @@
 <!doctype html>
-<html lang="ml">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Work</title>
+<title>TAGRO - Work</title>
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body data-page="work">
 <header class="shell-header">
-  <a class="logo" href="home.html"><img src="assets/images/tagro-logo.png" alt="TAGRO"></a>
+  <a class="logo" href="home.html" aria-label="Home">
+    <img src="assets/images/tagro-logo.png" alt="TAGRO">
+  </a>
   <span class="branch-pill" id="branchBadge">KVR</span>
   <span class="user-pill" id="userBadge">Staff</span>
 </header>
@@ -16,12 +18,12 @@
 <main>
   <div class="card">
     <div class="body">
-      <div class="hero">MS382 — Babu Contractor</div>
+      <h1 class="hero" style="margin-top:0;">MS382 — Babu Contractor</h1>
       <div class="sub">KVR/2606/016 · Crew waiting · Current bench work</div>
-      <div class="stage-strip">
+      <div class="stage-strip" aria-label="Job Progress" style="margin-top:12px;">
         <span class="stage done">Received</span>
         <span class="stage done">Inspected</span>
-        <span class="stage active">Repair</span>
+        <span class="stage active" aria-current="step">Repair</span>
         <span class="stage">Test</span>
         <span class="stage">Ready</span>
       </div>
@@ -29,12 +31,21 @@
   </div>
 
   <div class="card">
-    <div class="card-head"><h2>Resume reminder</h2><span class="pill amber">Future self</span></div>
+    <div class="card-head">
+      <h2>Resume reminder</h2>
+      <span class="pill amber">Future self</span>
+    </div>
     <div class="body">
-      <div class="notice">“Clutch removed. Next check oil pump drive. Chain brake band still open.”</div>
+      <blockquote class="notice" style="margin:0;">
+        “Clutch removed. Next check oil pump drive. Chain brake band still open.”
+      </blockquote>
       <div class="grid2" style="margin-top:12px">
-        <button class="btn primary">▶ Continue</button>
-        <button class="btn" onclick="document.getElementById('pausePanel').classList.toggle('hidden')">Pause</button>
+        <button class="btn primary">
+          <span aria-hidden="true">▶</span> Continue
+        </button>
+        <button class="btn" aria-expanded="false" aria-controls="pausePanel" onclick="const p=document.getElementById('pausePanel'); p.classList.toggle('hidden'); this.setAttribute('aria-expanded', !p.classList.contains('hidden'));">
+          Pause
+        </button>
       </div>
     </div>
   </div>
@@ -50,9 +61,9 @@
         <button class="pause-type" onclick="choosePause(this)">End of Day</button>
         <button class="pause-type" onclick="choosePause(this)">Other</button>
       </div>
-      <label>Resume reminder</label>
+      <label for="pauseNote">Resume reminder</label>
       <div class="voice">
-        <div class="mic">🎤</div>
+        <div class="mic" aria-hidden="true">🎤</div>
         <b>Tell yourself what to remember</b>
         <div class="small">Voice recording can be connected later. For now type a short note.</div>
       </div>
@@ -77,11 +88,11 @@
 </main>
 
 <nav class="bottom-nav">
-  <a class="navbtn" data-nav="home" href="home.html"><b>🏠</b>Home</a>
-  <a class="navbtn" data-nav="receive" href="receive.html"><b>➕</b>Receive</a>
-  <a class="navbtn" data-nav="bench" href="bench.html"><b>🔧</b>Bench</a>
-  <a class="navbtn" data-nav="work" href="work.html"><b>▶</b>Work</a>
-  <a class="navbtn" data-nav="more" href="#" onclick="logout()"><b>☰</b>Logout</a>
+  <a class="navbtn" data-nav="home" href="home.html"><b aria-hidden="true">🏠</b>Home</a>
+  <a class="navbtn" data-nav="receive" href="receive.html"><b aria-hidden="true">➕</b>Receive</a>
+  <a class="navbtn" data-nav="bench" href="bench.html"><b aria-hidden="true">🔧</b>Bench</a>
+  <a class="navbtn active" data-nav="work" href="work.html"><b aria-hidden="true">▶</b>Work</a>
+  <a class="navbtn" data-nav="more" href="#" onclick="logout(event)"><b aria-hidden="true">☰</b>Logout</a>
 </nav>
 <script src="assets/js/app.js"></script>
 </body>
