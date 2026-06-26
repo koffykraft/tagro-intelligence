@@ -19,11 +19,11 @@
       <span class="pill">Tap to select</span>
     </div>
     <div class="body">
-      <!-- Hidden inputs keep your existing app.js login() function working perfectly -->
+      <!-- Hidden inputs keep your app.js login() function working perfectly -->
       <input type="hidden" id="branch" value="">
       <input type="hidden" id="staff" value="">
 
-      <!-- Intuitive Grid replaces clunky select -->
+      <!-- Intuitive Grid -->
       <div class="grid3" id="branchButtons">
         <button type="button" class="btn branch-btn" onclick="pickBranch('KVR', this)">KVR</button>
         <button type="button" class="btn branch-btn" onclick="pickBranch('MDM', this)">MDM</button>
@@ -44,13 +44,13 @@
       </div>
       <div class="body">
         <div class="grid2" id="staffButtons">
-          <!-- Javascript will dynamically inject staff buttons here -->
+          <!-- Javascript dynamically injects staff buttons here from app.js -->
         </div>
 
         <!-- Step 3: PIN (Hidden until staff is selected) -->
         <div id="pinSection" class="hidden" style="margin-top:20px; padding-top:20px; border-top:1px dashed var(--line);">
           <label for="pin">Enter PIN</label>
-          <!-- Using password + numeric pattern summons the large native phone number pad -->
+          <!-- password + numeric pattern summons the large native phone number pad -->
           <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="PIN / SMS PIN later">
 
           <button type="button" class="btn primary block" style="margin-top:16px" onclick="login()">Login</button>
@@ -68,62 +68,5 @@
 </main>
 
 <script src="assets/js/app.js"></script>
-<script>
-  // Handles the progressive UI selection
-  function pickBranch(branchCode, btnElement) {
-    document.getElementById('branch').value = branchCode;
-    
-    // Visual feedback for selected branch
-    document.querySelectorAll('.branch-btn').forEach(btn => btn.classList.remove('primary'));
-    btnElement.classList.add('primary');
-
-    // Reveal staff section and hide PIN (forces sequential flow)
-    document.getElementById('staffSection').classList.remove('hidden');
-    document.getElementById('pinSection').classList.add('hidden'); 
-    document.getElementById('staff').value = ''; 
-
-    // Generate Staff buttons based on branch
-    const staffList = STAFF[branchCode] || [];
-    const staffGrid = document.getElementById('staffButtons');
-    
-    let html = staffList.map(name => 
-      `<button type="button" class="btn staff-btn" onclick="pickStaff('${name}', this)">${name}</button>`
-    ).join("");
-    
-    // Add the "New User" button at the end of the list
-    html += `<button type="button" class="btn soft staff-btn" onclick="promptNewUser()">+ New User</button>`;
-    
-    staffGrid.innerHTML = html;
-  }
-
-  function pickStaff(name, btnElement) {
-    document.getElementById('staff').value = name;
-    
-    // Visual feedback for selected staff
-    document.querySelectorAll('.staff-btn').forEach(btn => btn.classList.remove('selected'));
-    btnElement.classList.add('selected');
-
-    // Reveal PIN section and auto-focus the input to summon the keyboard instantly
-    document.getElementById('pinSection').classList.remove('hidden');
-    
-    // Slight timeout allows the UI to render before focusing the keyboard
-    setTimeout(() => document.getElementById('pin').focus(), 50);
-  }
-
-  // Feature: Add a new user dynamically to the current branch
-  function promptNewUser() {
-    const newName = prompt("Enter the new staff member's name:");
-    if (newName && newName.trim() !== "") {
-       const branch = document.getElementById('branch').value;
-       
-       // Ensure the branch array exists, then push the new name
-       if (!STAFF[branch]) STAFF[branch] = [];
-       STAFF[branch].push(newName.trim());
-       
-       // Re-click the active branch button to refresh the UI and show the new name
-       document.querySelector('.branch-btn.primary').click();
-    }
-  }
-</script>
 </body>
 </html>
