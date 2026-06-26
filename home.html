@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TAGRO Home</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body data-page="home">
+<header class="shell-header">
+  <a class="logo" href="home.html"><img src="assets/images/tagro-logo.png" alt="TAGRO"></a>
+  <span class="branch-pill" id="branchBadge">KVR</span>
+  <span class="user-pill" id="userBadge">Staff</span>
+</header>
+
+<main>
+  <div class="card">
+    <div class="body">
+      <div class="hero">What happened now?</div>
+      <div class="sub">This is not a menu. Choose the real shop-floor event.</div>
+      <div class="grid2" style="margin-top:16px">
+        <a class="btn primary" href="receive.html">Customer arrived</a>
+        <a class="btn" href="bench.html">Resume / Continue repair</a>
+        <a class="btn" href="work.html">Need part</a>
+        <a class="btn" href="bench.html">Machine ready / delivery</a>
+        <a class="btn" href="receive.html">Customer called</a>
+        <a class="btn" href="bench.html">Manager review</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="stat"><b>1</b><span>Customer waiting</span></div>
+    <div class="stat"><b>3</b><span>Need inspection</span></div>
+    <div class="stat"><b>2</b><span>Ready</span></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><h2>Today in this workshop</h2><span class="pill">live</span></div>
+    <div class="body">
+      <div class="list click" onclick="location.href='bench.html'">
+        <div class="title">Rajeev paused MS382 <span class="pill amber">Resume note</span></div>
+        <div class="small">“Clutch removed. Next check oil pump drive.”</div>
+      </div>
+      <div class="list click" onclick="location.href='receive.html'">
+        <div class="title">Customer waiting at counter <span class="pill red">Now</span></div>
+        <div class="small">Machine stopped work. Get situation first, not diagnosis.</div>
+      </div>
+      <div class="list click" onclick="location.href='bench.html'">
+        <div class="title">3 machines waiting inspection</div>
+        <div class="small">Give small inspection window, not full doorway.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <a class="navbtn" data-nav="home" href="home.html"><b>🏠</b>Home</a>
+  <a class="navbtn" data-nav="receive" href="receive.html"><b>➕</b>Receive</a>
+  <a class="navbtn" data-nav="bench" href="bench.html"><b>🔧</b>Bench</a>
+  <a class="navbtn" data-nav="work" href="work.html"><b>▶</b>Work</a>
+  <a class="navbtn" data-nav="more" href="#" onclick="logout()"><b>☰</b>Logout</a>
+</nav>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
