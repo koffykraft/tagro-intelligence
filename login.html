@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TAGRO Login</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body data-page="login">
+<main class="login-wrap">
+  <div class="login-logo"><img src="assets/images/tagro-logo.png" alt="TAGRO"></div>
+  <div class="sub" style="text-align:center;letter-spacing:5px;font-weight:950;text-transform:uppercase">Service Centre</div>
+
+  <div class="card" style="margin-top:30px">
+    <div class="card-head"><h2>Login</h2><span class="pill">No typing names</span></div>
+    <div class="body">
+      <label>Branch</label>
+      <select id="branch" onchange="loadStaff()">
+        <option>KVR</option><option>MDM</option><option>PKM</option><option>SKT</option><option>NDD</option><option>OYR</option><option>SDM</option><option>OWNER</option>
+      </select>
+
+      <label>Staff / Manager</label>
+      <select id="staff"></select>
+
+      <label>PIN</label>
+      <input id="pin" inputmode="numeric" maxlength="6" placeholder="PIN / SMS PIN later">
+
+      <button class="btn primary block" style="margin-top:16px" onclick="login(false)">Login</button>
+      <button class="btn block" style="margin-top:10px" onclick="login(true)">Demo Mode</button>
+
+      <div class="notice" style="margin-top:14px">
+        V4 focus: get staff into the workshop fast. Authentication can later move to SMS PIN through the backend.
+      </div>
+    </div>
+  </div>
+</main>
+<script src="assets/js/app.js"></script>
+<script>loadStaff();</script>
+</body>
+</html>
