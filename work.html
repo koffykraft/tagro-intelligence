@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Work</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body data-page="work">
+<header class="shell-header">
+  <a class="logo" href="home.html"><img src="assets/images/tagro-logo.png" alt="TAGRO"></a>
+  <span class="branch-pill" id="branchBadge">KVR</span>
+  <span class="user-pill" id="userBadge">Staff</span>
+</header>
+
+<main>
+  <div class="card">
+    <div class="body">
+      <div class="hero">MS382 — Babu Contractor</div>
+      <div class="sub">KVR/2606/016 · Crew waiting · Current bench work</div>
+      <div class="stage-strip">
+        <span class="stage done">Received</span>
+        <span class="stage done">Inspected</span>
+        <span class="stage active">Repair</span>
+        <span class="stage">Test</span>
+        <span class="stage">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Resume reminder</h2><span class="pill amber">Future self</span></div>
+    <div class="body">
+      <div class="notice">“Clutch removed. Next check oil pump drive. Chain brake band still open.”</div>
+      <div class="grid2" style="margin-top:12px">
+        <button class="btn primary">▶ Continue</button>
+        <button class="btn" onclick="document.getElementById('pausePanel').classList.toggle('hidden')">Pause</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pausePanel" class="card hidden">
+    <div class="card-head"><h2>Why stopping?</h2></div>
+    <div class="body">
+      <div class="grid2">
+        <button class="pause-type" onclick="choosePause(this)">Waiting Customer</button>
+        <button class="pause-type" onclick="choosePause(this)">Waiting Parts</button>
+        <button class="pause-type" onclick="choosePause(this)">Outside Work</button>
+        <button class="pause-type" onclick="choosePause(this)">Priority Changed</button>
+        <button class="pause-type" onclick="choosePause(this)">End of Day</button>
+        <button class="pause-type" onclick="choosePause(this)">Other</button>
+      </div>
+      <label>Resume reminder</label>
+      <div class="voice">
+        <div class="mic">🎤</div>
+        <b>Tell yourself what to remember</b>
+        <div class="small">Voice recording can be connected later. For now type a short note.</div>
+      </div>
+      <textarea id="pauseNote" placeholder="Example: cylinder off, piston removed, next inspect crank..."></textarea>
+      <button class="btn primary block" style="margin-top:12px" onclick="pauseWork()">Save Pause</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>What happened?</h2></div>
+    <div class="body">
+      <div class="grid2">
+        <button class="btn" onclick="addPO('Clutch Spring')">Need part</button>
+        <button class="btn">Photo</button>
+        <button class="btn">Voice note</button>
+        <button class="btn">Observation</button>
+        <button class="btn green">Work complete</button>
+        <button class="btn soft">Test machine</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <a class="navbtn" data-nav="home" href="home.html"><b>🏠</b>Home</a>
+  <a class="navbtn" data-nav="receive" href="receive.html"><b>➕</b>Receive</a>
+  <a class="navbtn" data-nav="bench" href="bench.html"><b>🔧</b>Bench</a>
+  <a class="navbtn" data-nav="work" href="work.html"><b>▶</b>Work</a>
+  <a class="navbtn" data-nav="more" href="#" onclick="logout()"><b>☰</b>Logout</a>
+</nav>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
