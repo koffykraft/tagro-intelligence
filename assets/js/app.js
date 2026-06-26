@@ -24,8 +24,11 @@ function login() {
 }
 
 function session() {
-  try { return JSON.parse(localStorage.getItem("tagroSession") || "null"); }
-  catch { return null; }
+  try { 
+    return JSON.parse(localStorage.getItem("tagroSession") || "null"); 
+  } catch { 
+    return null; 
+  }
 }
 
 function requireSession() {
@@ -128,99 +131,4 @@ function saveNewMachine() {
   
   if (!model) { 
     alert("Enter model"); 
-    return; 
-  }
-  
-  const m = document.getElementById("machineSelect");
-  if (m) {
-    m.innerHTML = `<option>${model}${serial ? " — Serial " + serial : " — Serial unknown"}</option>` + m.innerHTML;
-    m.selectedIndex = 0;
-  }
-  document.getElementById("newMachinePanel").classList.remove("show");
-}
-
-function receiveMachine() {
-  alert("Reception Complete. Machine moved to Waiting Inspection.");
-  location.href = "bench.html";
-}
-
-function renderBench() {
-  const current = document.getElementById("currentJob");
-  const paused = document.getElementById("pausedJobs");
-  const waiting = document.getElementById("waitingJobs");
-  
-  // Find current job (assuming you will flag it in your DB)
-  const currentJob = JOBS.find(j => j.isCurrent); 
-  
-  if (current) {
-    if (currentJob) {
-      current.innerHTML = `
-        <div class="list workbench-current">
-          <div class="title">${currentJob.model} — ${currentJob.customer} <span class="pill">Current</span></div>
-          <div class="small">Paused 18 min ago · ${currentJob.note || ''}</div>
-          <div class="grid2" style="margin-top:12px">
-            <a class="btn primary" href="work.html?job=${currentJob.id}">▶ Resume</a>
-            <a class="btn" href="work.html?job=${currentJob.id}">Open</a>
-          </div>
-        </div>`;
-    } else {
-      current.innerHTML = `<div class="small">No active job on bench.</div>`;
-    }
-  }
-  
-  if (paused) {
-    const pauseStates = ["Paused", "Waiting Parts", "Manager Review"];
-    const pausedList = JOBS.filter(j => pauseStates.includes(j.state));
-    
-    paused.innerHTML = pausedList.length ? pausedList.map(j => `
-      <div class="list click" onclick="location.href='work.html?job=${j.id}'">
-        <div class="title">${j.model} — ${j.customer} <span class="pill amber">${j.state}</span></div>
-        <div class="small">Next: ${j.next || 'N/A'}<br>${j.note || ''}</div>
-      </div>`).join("") : `<div class="small">No paused jobs.</div>`;
-  }
-  
-  if (waiting) {
-    const waitingList = JOBS.filter(j => j.state === "Waiting Inspection");
-    
-    waiting.innerHTML = waitingList.length ? waitingList.map(j => `
-      <div class="list click" onclick="location.href='work.html?job=${j.id}'">
-        <div class="title">${j.model} — ${j.customer} <span class="pill">${j.state}</span></div>
-        <div class="small">${j.urgency || ''}<br>${j.note || ''}</div>
-      </div>`).join("") : `<div class="small">No machines waiting.</div>`;
-  }
-}
-
-function choosePause(btn) {
-  document.querySelectorAll(".pause-type").forEach(x => x.classList.remove("selected"));
-  btn.classList.add("selected");
-}
-
-function pauseWork() {
-  const reason = document.querySelector(".pause-type.selected")?.textContent.trim() || "Pause";
-  const note = document.getElementById("pauseNote")?.value.trim();
-  
-  localStorage.setItem("tagroPauseNote", JSON.stringify({ reason, note, at: new Date().toISOString() }));
-  alert("Paused with resume reminder.");
-  location.href = "bench.html";
-}
-
-function addPO(part) {
-  const list = JSON.parse(localStorage.getItem("tagroPO") || "[]");
-  const s = session();
-  
-  if (!s) {
-    alert("Session expired. Please log in again.");
-    return;
-  }
-  
-  list.unshift({ part, branch: s.branch, staff: s.staff, at: new Date().toISOString(), status: "Need Purchase / Transfer" });
-  localStorage.setItem("tagroPO", JSON.stringify(list));
-  alert("Added to Purchase Order.");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  requireSession();
-  const page = document.body.dataset.page;
-  setupShell(page);
-  if (page === "bench") renderBench();
-});
+    return
