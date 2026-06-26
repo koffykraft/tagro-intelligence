@@ -1,88 +1,105 @@
 <!doctype html>
-<html lang="ml">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Receive</title>
+<title>TAGRO - Receive</title>
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body data-page="receive">
 <header class="shell-header">
-  <a class="logo" href="home.html"><img src="assets/images/tagro-logo.png" alt="TAGRO"></a>
+  <a class="logo" href="home.html" aria-label="Home">
+    <img src="assets/images/tagro-logo.png" alt="TAGRO">
+  </a>
   <span class="branch-pill" id="branchBadge">KVR</span>
   <span class="user-pill" id="userBadge">Staff</span>
 </header>
 
 <main>
   <div class="card">
-    <div class="card-head"><h2>Reception</h2><span class="pill green">Under 1 minute</span></div>
+    <div class="card-head">
+      <!-- Upgraded to h1 for screen reader document structure -->
+      <h1 style="margin:0; font-size:13px; letter-spacing:2px; color:var(--muted); text-transform:uppercase;">Reception</h1>
+      <span class="pill green">Under 1 minute</span>
+    </div>
     <div class="body">
-      <div class="notice">
+      <!-- Added role="note" for semantic context -->
+      <div class="notice" role="note">
         First job: make contact. Record the customer’s words. Mechanic diagnosis comes later.
       </div>
 
-      <label>Phone / Alias / Name / Serial</label>
-      <input id="custSearch" inputmode="search" autocomplete="off" placeholder="Rubber Jose, 9447..., MS250..." oninput="searchCustomer()">
+      <!-- Linked label to input via 'for' attribute -->
+      <label for="custSearch">Phone / Alias / Name / Serial</label>
+      <input id="custSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rubber Jose, 9447..., MS250..." oninput="searchCustomer()">
       <div id="customerResults" class="search-results"></div>
 
       <div class="grid2" style="margin-top:10px">
-        <button class="btn" onclick="showPanel('newCustomerPanel')">+ New Customer</button>
-        <button class="btn" onclick="showPanel('newMachinePanel')">+ New Machine</button>
+        <button type="button" class="btn" onclick="showPanel('newCustomerPanel')">+ New Customer</button>
+        <button type="button" class="btn" onclick="showPanel('newMachinePanel')">+ New Machine</button>
       </div>
 
       <div id="newCustomerPanel" class="form-panel">
         <div class="title">New Customer</div>
-        <label>Name</label><input id="newName" placeholder="Customer name">
-        <label>Phone</label><input id="newPhone" inputmode="tel" placeholder="Phone">
-        <label>Alias / Local memory</label><input id="newAlias" placeholder="Sawmill Jose, Forest Babu">
-        <button class="btn primary block" style="margin-top:12px" onclick="saveNewCustomer()">Save Customer</button>
+        <label for="newName">Name</label>
+        <input id="newName" type="text" placeholder="Customer name">
+        <label for="newPhone">Phone</label>
+        <input id="newPhone" type="tel" inputmode="tel" placeholder="Phone">
+        <label for="newAlias">Alias / Local memory</label>
+        <input id="newAlias" type="text" placeholder="Sawmill Jose, Forest Babu">
+        <button type="button" class="btn primary block" style="margin-top:12px" onclick="saveNewCustomer()">Save Customer</button>
       </div>
 
-      <label>Machine</label>
+      <label for="machineSelect">Machine</label>
       <select id="machineSelect">
         <option>Select after customer search</option>
-        <option>New machine / serial unknown</option>
+        <option value="new">New machine / serial unknown</option>
       </select>
 
       <div id="newMachinePanel" class="form-panel">
         <div class="title">New Machine</div>
-        <label>Model</label><input id="newModel" placeholder="MS250, MS382, FS120">
-        <label>Serial</label><input id="newSerial" placeholder="If available">
-        <button class="btn primary block" style="margin-top:12px" onclick="saveNewMachine()">Save Machine</button>
+        <label for="newModel">Model</label>
+        <input id="newModel" type="text" placeholder="MS250, MS382, FS120">
+        <label for="newSerial">Serial</label>
+        <input id="newSerial" type="text" placeholder="If available">
+        <button type="button" class="btn primary block" style="margin-top:12px" onclick="saveNewMachine()">Save Machine</button>
       </div>
 
+      <!-- Urgency Section -->
       <label>What is stopping your work today?</label>
-      <div class="grid2">
-        <button class="btn" onclick="selectOne(this,'.urgency') ; this.classList.add('urgency')">Machine stopped work</button>
-        <button class="btn" onclick="selectOne(this,'.urgency') ; this.classList.add('urgency')">Needed tomorrow</button>
-        <button class="btn" onclick="selectOne(this,'.urgency') ; this.classList.add('urgency')">Can wait</button>
-        <button class="btn" onclick="selectOne(this,'.urgency') ; this.classList.add('urgency')">Periodic service</button>
+      <div class="grid2" role="group" aria-label="Urgency level">
+        <!-- Pre-applied the 'urgency' class to fix the brittle inline JS -->
+        <button type="button" class="btn urgency" onclick="selectOne(this, '.urgency')">Machine stopped work</button>
+        <button type="button" class="btn urgency" onclick="selectOne(this, '.urgency')">Needed tomorrow</button>
+        <button type="button" class="btn urgency" onclick="selectOne(this, '.urgency')">Can wait</button>
+        <button type="button" class="btn urgency" onclick="selectOne(this, '.urgency')">Periodic service</button>
       </div>
 
-      <label>Customer says</label>
-      <textarea placeholder="Record exactly what customer says. Do not diagnose here."></textarea>
+      <!-- Added ID so Javascript can actually target and save this note -->
+      <label for="customerNotes">Customer says</label>
+      <textarea id="customerNotes" placeholder="Record exactly what customer says. Do not diagnose here."></textarea>
 
+      <!-- Common Words Section -->
       <label>Common words</label>
-      <div class="grid2">
-        <button class="btn" onclick="toggle(this)">Won't start</button>
-        <button class="btn" onclick="toggle(this)">No power</button>
-        <button class="btn" onclick="toggle(this)">Stops after heating</button>
-        <button class="btn" onclick="toggle(this)">Fuel leak</button>
-        <button class="btn" onclick="toggle(this)">Starter rope</button>
-        <button class="btn" onclick="toggle(this)">Chain problem</button>
+      <div class="grid2" role="group" aria-label="Common issues">
+        <button type="button" class="btn symptom-tag" onclick="toggle(this)">Won't start</button>
+        <button type="button" class="btn symptom-tag" onclick="toggle(this)">No power</button>
+        <button type="button" class="btn symptom-tag" onclick="toggle(this)">Stops after heating</button>
+        <button type="button" class="btn symptom-tag" onclick="toggle(this)">Fuel leak</button>
+        <button type="button" class="btn symptom-tag" onclick="toggle(this)">Starter rope</button>
+        <button type="button" class="btn symptom-tag" onclick="toggle(this)">Chain problem</button>
       </div>
 
-      <button class="btn primary block" style="margin-top:16px" onclick="receiveMachine()">Reception Complete</button>
+      <button type="button" class="btn primary block" style="margin-top:16px" onclick="receiveMachine()">Reception Complete</button>
     </div>
   </div>
 </main>
 
 <nav class="bottom-nav">
-  <a class="navbtn" data-nav="home" href="home.html"><b>🏠</b>Home</a>
-  <a class="navbtn" data-nav="receive" href="receive.html"><b>➕</b>Receive</a>
-  <a class="navbtn" data-nav="bench" href="bench.html"><b>🔧</b>Bench</a>
-  <a class="navbtn" data-nav="work" href="work.html"><b>▶</b>Work</a>
-  <a class="navbtn" data-nav="more" href="#" onclick="logout()"><b>☰</b>Logout</a>
+  <a class="navbtn" data-nav="home" href="home.html"><b aria-hidden="true">🏠</b>Home</a>
+  <a class="navbtn active" data-nav="receive" href="receive.html"><b aria-hidden="true">➕</b>Receive</a>
+  <a class="navbtn" data-nav="bench" href="bench.html"><b aria-hidden="true">🔧</b>Bench</a>
+  <a class="navbtn" data-nav="work" href="work.html"><b aria-hidden="true">▶</b>Work</a>
+  <a class="navbtn" data-nav="more" href="#" onclick="logout(event)"><b aria-hidden="true">☰</b>Logout</a>
 </nav>
 <script src="assets/js/app.js"></script>
 </body>
