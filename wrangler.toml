@@ -1,0 +1,42 @@
+# TAGRO OS — Cloudflare Worker Configuration
+# New standalone deployment. Not related to service.tagro.in.
+# Run: npx wrangler deploy
+
+name = "tagro-os"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+[vars]
+ENVIRONMENT = "production"
+
+# ── KV NAMESPACE ─────────────────────────────────────────
+# Stores: models, parts, staff, pricing, labour, documents, OTP codes, device records
+# Create: npx wrangler kv namespace create TAGRO_DATA
+# Then replace the id below with the returned id.
+[[kv_namespaces]]
+binding  = "TAGRO_DATA"
+id       = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# ── R2 BUCKET ────────────────────────────────────────────
+# Stores: workshop manuals, IPLs, PDFs, documents
+# Create: npx wrangler r2 bucket create tagro-manuals
+[[r2_buckets]]
+binding    = "TAGRO_MANUALS"
+bucket_name = "tagro-manuals"
+
+# ── D1 DATABASE ───────────────────────────────────────────
+# Stores: service jobs, events, history
+# Create: npx wrangler d1 create tagro-db
+# Then replace the database_id below.
+[[d1_databases]]
+binding     = "TAGRO_DB"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_name = "tagro-db"
+
+# ── SECRETS ───────────────────────────────────────────────
+# Set via: npx wrangler secret put OWNER_TOKEN
+# Required secrets:
+#   OWNER_TOKEN    — admin operations (KV set, R2 put, pricing import)
+#   FAST2SMS_KEY   — OTP SMS delivery
+#   DROPBOX_TOKEN  — Dropbox sync for job backup
+#   ANTHROPIC_KEY  — AI tech assistant (future)
