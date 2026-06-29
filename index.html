@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TAGRO">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>TAGRO OS</title>
+<link rel="stylesheet" href="os-shell.css">
+<script src="os-manifest.js"></script>
+<script src="os-icons.js"></script>
+<script src="os-core.js"></script>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div id="os-statusbar">
+  <div class="sb-left">
+    <span class="sb-branch" id="sb-branch">—</span>
+    <span class="sb-user" id="sb-user"></span>
+  </div>
+  <div class="sb-right">
+    <div id="notif-badge-wrap">
+      <button id="notif-btn" onclick="ShadeController.open()" aria-label="Notifications">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <div id="notif-badge">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="os-home">
+  <div id="icon-pages">
+    <!-- Pages rendered by JS -->
+  </div>
+</div>
+
+<!-- PAGE DOTS -->
+<div id="page-dots"></div>
+
+<!-- DOCK -->
+<div id="os-dock">
+  <button class="dock-btn" onclick="AppLauncher.close(); ShadeController.close();" title="Home">
+    <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="dock-btn" onclick="AppLauncher.open('receive')" title="Receive Machine">
+    <svg viewBox="0 0 24 24"><path d="M12 2v13M8 11l4 4 4-4"/><rect x="3" y="17" width="18" height="4" rx="2"/></svg>
+    <span>Receive</span>
+  </button>
+  <button class="dock-btn" onclick="AppLauncher.open('jobs')" title="All Jobs">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    <span>Jobs</span>
+  </button>
+
+</div>
+
+<!-- EXIT TO PHONE -->
+<button id="btn-exit-phone" onclick="exitToPhone()" title="Return to phone">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+  </svg>
+</button>
+
+<!-- HARD RESET -->
+<button id="btn-hard-reset" onclick="HardReset.trigger()" title="Recover from hang">
+  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.9"/></svg>
+</button>
+
+<!-- NOTIFICATION SHADE -->
+<div id="notif-shade">
+  <div id="shade-backdrop" onclick="ShadeController.close()"></div>
+  <div id="shade-panel">
+    <div id="shade-drag-area" onclick="ShadeController.close()">
+      <div class="shade-handle"></div>
+    </div>
+
+    <!-- Quick settings -->
+    <div id="shade-quick">
+
+      <div class="quick-tile" id="qt-branch">
+        <span class="qt-icon">🏢</span>
+        <span class="qt-label" id="qt-branch-label">Branch</span>
+      </div>
+      <div class="quick-tile" onclick="ShadeController.openSettings()">
+        <span class="qt-icon">⚙️</span>
+        <span class="qt-label">Settings</span>
+      </div>
+      <div class="quick-tile" onclick="doLogout()">
+        <span class="qt-icon">🔒</span>
+        <span class="qt-label">Logout</span>
+      </div>
+    </div>
+
+    <!-- Pinned shortcuts -->
+    <div id="shade-shortcuts">
+      <!-- rendered by JS -->
+    </div>
+
+    <!-- Notifications -->
+    <div id="shade-notifs">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- APP OVERLAY -->
+<div id="app-overlay">
+  <div id="app-titlebar">
+    <button id="app-back" onclick="AppLauncher.close()" aria-label="Back to home">‹</button>
+    <span id="app-title">App</span>
+  </div>
+  <iframe id="app-frame" src="about:blank" allow="microphone; camera"></iframe>
+</div>
+
+<!-- TOAST -->
+<div id="os-toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// TAGRO OS — Shell Controller
+// ═══════════════════════════════════════════════════════════
+
+// ── BOOT ──────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', boot);
+
+async function boot() {
+  if (!Session.valid()) {
+    location.href = 'login.html';
+    return;
+  }
+  const s = Session.get();
+  updateStatusBar(s);
+  renderIconGrid(s);
+  renderShade(s);
+  Notifications.badge();
+  setupSwipeGesture();
+  setupPageSwipe();
+
+  // Background tasks
+  KVConfig.load().catch(() => {});
+  setTimeout(() => Jobs.pull().catch(() => {}), 800);
+
+  // Seed a welcome notification if first boot
+  if (!OS.get('tagro_booted')) {
+    OS.set('tagro_booted', true);
+    Notifications.add(`Welcome to TAGRO OS, ${s.name}. Tap any app to begin.`, 'internal');
+  }
+}
+
+// ── STATUS BAR ────────────────────────────────────────────
+function updateStatusBar(s) {
+  const branch = s?.branch || '—';
+  document.getElementById('sb-branch').textContent = branch;
+  document.getElementById('sb-user').textContent = s?.name || '';
+  document.getElementById('qt-branch-label').textContent = branch;
+}
+
+// ── ICON GRID ─────────────────────────────────────────────
+let currentPage = 0;
+let iconOrder   = [];
+
+function getVisibleApps(s) {
+  // Delegates entirely to TAGRO_MANIFEST.canAccess — the single permission authority.
+  // The shell never contains permission logic. It only asks the registry.
+  return TAGRO_MANIFEST.apps.filter(a => TAGRO_MANIFEST.canAccess(a, s));
+}
+
+function renderIconGrid(s) {
+  // Load saved order
+  const saved = OS.get('tagro_icon_order', null);
+  const apps  = getVisibleApps(s);
+
+  // Use saved order if valid, else default
+  if (saved && saved.every(id => apps.find(a => a.id === id))) {
+    iconOrder = saved.map(id => apps.find(a => a.id === id));
+  } else {
+    iconOrder = apps;
+  }
+
+  const ICONS_PER_PAGE = 12; // 4×3 grid
+  const pages = [];
+  for (let i = 0; i < iconOrder.length; i += ICONS_PER_PAGE) {
+    pages.push(iconOrder.slice(i, i + ICONS_PER_PAGE));
+  }
+
+  const container = document.getElementById('icon-pages');
+  container.innerHTML = '';
+
+  pages.forEach((pageApps, pageIdx) => {
+    const page = document.createElement('div');
+    page.className = 'icon-page';
+    page.dataset.page = pageIdx;
+    page.style.display = pageIdx === 0 ? 'grid' : 'none';
+
+    pageApps.forEach(app => {
+      const el = document.createElement('div');
+      el.className = 'app-icon';
+      el.dataset.appId = app.id;
+      el.innerHTML = `
+        <div class="icon-bubble" style="background: ${app.color}">
+          ${ICONS[app.icon] || ICONS.close}
+        </div>
+        <span class="icon-label">${app.label}</span>
+      `;
+      el.addEventListener('click', () => AppLauncher.open(app.id));
+      setupLongPress(el, app);
+      page.appendChild(el);
+    });
+
+    container.appendChild(page);
+  });
+
+  renderPageDots(pages.length);
+}
+
+// ── PAGE DOTS ─────────────────────────────────────────────
+function renderPageDots(count) {
+  const dots = document.getElementById('page-dots');
+  dots.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement('div');
+    d.className = 'page-dot' + (i === 0 ? ' active' : '');
+    dots.appendChild(d);
+  }
+}
+
+function setPage(n) {
+  const pages = document.querySelectorAll('.icon-page');
+  if (n < 0 || n >= pages.length) return;
+  pages.forEach((p, i) => p.style.display = i === n ? 'grid' : 'none');
+  document.querySelectorAll('.page-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === n);
+  });
+  currentPage = n;
+}
+
+// ── HORIZONTAL SWIPE (page switching) ─────────────────────
+function setupPageSwipe() {
+  const home = document.getElementById('os-home');
+  let sx = 0, sy = 0, dragging = false;
+
+  home.addEventListener('touchstart', e => {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    dragging = true;
+  }, { passive: true });
+
+  home.addEventListener('touchend', e => {
+    if (!dragging) return;
+    dragging = false;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 50) {
+      if (dx < 0) setPage(currentPage + 1);
+      else         setPage(currentPage - 1);
+    }
+  }, { passive: true });
+}
+
+// ── SHADE SWIPE (pull down from top) ──────────────────────
+const ShadeController = {
+  open: () => {
+    renderNotifList();
+    document.getElementById('notif-shade').classList.add('open');
+    Notifications.markRead();
+  },
+  close: () => document.getElementById('notif-shade').classList.remove('open'),
+
+  openSettings: () => {
+    ShadeController.close();
+    const s   = Session.get();
+    const ovl = document.getElementById('settings-overlay');
+    document.getElementById('settings-session').innerHTML =
+      `<strong style="color:white">${OS.esc(s?.name || '—')}</strong><br>
+       ${OS.esc(s?.branch || '—')} — ${OS.esc(s?.branchName || '')}
+       ${s?.role ? '<br><span style="color:#df6427;font-weight:800">' + OS.esc(s.role) + '</span>' : ''}`;
+    document.getElementById('settings-device').textContent = getDeviceId();
+    document.getElementById('settings-version').textContent = TAGRO_MANIFEST.version + ' · ' + TAGRO_MANIFEST.build;
+    ovl.style.display = 'block';
+  },
+
+  closeSettings: () => {
+    document.getElementById('settings-overlay').style.display = 'none';
+  }
+};
+
+function setupSwipeGesture() {
+  let startY = 0, startX = 0;
+
+  document.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const dy = e.changedTouches[0].clientY - startY;
+    const dx = e.changedTouches[0].clientX - startX;
+    // Pull down from top third to open shade
+    if (dy > 80 && startY < window.innerHeight * 0.35 && Math.abs(dx) < 60) {
+      if (!document.getElementById('notif-shade').classList.contains('open')) {
+        ShadeController.open();
+      }
+    }
+    // Swipe up on shade to close
+    if (dy < -60 && document.getElementById('notif-shade').classList.contains('open')) {
+      ShadeController.close();
+    }
+  }, { passive: true });
+}
+
+// ── LONG PRESS (icon wiggle / move future) ────────────────
+function setupLongPress(el, app) {
+  let timer;
+  el.addEventListener('touchstart', () => {
+    timer = setTimeout(() => {
+      Toast.show('Hold to rearrange — coming soon');
+    }, 600);
+  }, { passive: true });
+  el.addEventListener('touchend',   () => clearTimeout(timer), { passive: true });
+  el.addEventListener('touchmove',  () => clearTimeout(timer), { passive: true });
+}
+
+// ── NOTIFICATION SHADE ────────────────────────────────────
+function renderShade(s) {
+  // Pinned shortcuts — top 4 apps
+  const shortcuts = document.getElementById('shade-shortcuts');
+  const apps = getVisibleApps(s).slice(0, 6);
+  shortcuts.innerHTML = apps.map(a => `
+    <div class="shortcut-chip" onclick="ShadeController.close(); AppLauncher.open('${a.id}')">
+      <div style="width:20px;height:20px;background:${a.color};border-radius:6px;display:flex;align-items:center;justify-content:center;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${ICONS[a.icon]?.match(/<[^>]+>[\s\S]*<\/[^>]+>/)?.[0] || ''}</svg>
+      </div>
+      ${a.label}
+    </div>
+  `).join('');
+}
+
+function renderNotifList() {
+  const list  = document.getElementById('shade-notifs');
+  const notifs = Notifications.all();
+  const colors = TAGRO_MANIFEST.notificationColors;
+
+  if (!notifs.length) {
+    list.innerHTML = `<div style="text-align:center;padding:32px;color:rgba(255,255,255,.4);font-size:14px;">No notifications</div>`;
+    return;
+  }
+
+  list.innerHTML = notifs.slice(0, 30).map(n => {
+    const c = colors[n.type] || colors.internal;
+    return `
+      <div class="notif-item" onclick="handleNotifTap('${n.id}')">
+        <div class="notif-dot" style="background:${c.dot}"></div>
+        <div class="notif-body">
+          <div class="notif-type" style="color:${c.dot}">${c.label}</div>
+          <div class="notif-msg">${OS.esc(n.msg)}</div>
+          <div class="notif-time">${timeAgo(n.at)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function handleNotifTap(id) {
+  ShadeController.close();
+}
+
+
+
+// ── EXIT TO PHONE ─────────────────────────────────────────
+function exitToPhone() {
+  if (window.history.length > 1) {
+    window.history.go(-(window.history.length));
+  } else {
+    // iOS: can't programmatically exit — guide the user
+    Toast.show('Press your phone home button to exit');
+  }
+}
+
+// ── LOGOUT ────────────────────────────────────────────────
+function doLogout() {
+  Session.clear();
+  location.href = 'login.html';
+}
+
+
+</script>
+
+<!-- SETTINGS PANEL (shade-only, no separate file needed) -->
+<div id="settings-overlay" style="
+  display:none; position:fixed; inset:0; z-index:900;
+  background:rgba(0,0,0,.5); backdrop-filter:blur(6px);">
+  <div id="settings-panel" style="
+    position:absolute; bottom:0; left:0; right:0;
+    background:#1a1a2e; border-radius:24px 24px 0 0;
+    padding:0 0 calc(env(safe-area-inset-bottom,0px) + 24px);
+    max-height:80vh; overflow-y:auto;">
+    <div style="width:36px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;margin:12px auto 0;"></div>
+    <div style="padding:20px 24px 8px;font-size:12px;font-weight:900;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;">Settings</div>
+
+    <div style="padding:0 20px;">
+      <!-- Session info -->
+      <div style="background:rgba(255,255,255,.06);border-radius:14px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Session</div>
+        <div id="settings-session" style="font-size:14px;color:rgba(255,255,255,.8);line-height:1.6;"></div>
+      </div>
+
+      <!-- Device info -->
+      <div style="background:rgba(255,255,255,.06);border-radius:14px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Device</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6);" id="settings-device"></div>
+      </div>
+
+      <!-- Version -->
+      <div style="background:rgba(255,255,255,.06);border-radius:14px;padding:14px 16px;margin-bottom:20px;">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">TAGRO OS</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.5);">Version <span id="settings-version"></span></div>
+      </div>
+
+      <button onclick="doLogout()" style="
+        width:100%;padding:14px;background:rgba(220,40,40,.15);
+        color:#f87171;border:1.5px solid rgba(220,40,40,.3);
+        border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;">
+        Log Out
+      </button>
+      <button onclick="ShadeController.closeSettings()" style="
+        width:100%;padding:14px;background:rgba(255,255,255,.07);
+        color:rgba(255,255,255,.6);border:1.5px solid rgba(255,255,255,.1);
+        border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Receive — TAGRO OS</title>
+<style>
+/* ── RECEIVE APP STYLES ─────────────────────────────────
+   Self-contained. Uses OS CSS variables via the shell.
+   Never imports from os-shell.css — apps are independent. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --tagro:       #df6427;
+  --tagro-dark:  #b84e1c;
+  --tagro-light: #fff7ed;
+  --green:       #287a3e;
+  --blue:        #2563eb;
+  --warn:        #b45309;
+  --surface:     #ffffff;
+  --bg:          #f0ede8;
+  --text:        #121212;
+  --muted:       #6b7280;
+  --border:      #e5e7eb;
+  --radius:      16px;
+  --font:        -apple-system, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  height: 100%; background: var(--bg);
+  font-family: var(--font); color: var(--text);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── PROGRESS BAR ──────────────────────────────────────── */
+#progress-bar {
+  position: sticky; top: 0; z-index: 10;
+  background: white; border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+}
+.steps {
+  display: flex; gap: 6px; align-items: center;
+}
+.step-pip {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: var(--border); transition: background .3s;
+}
+.step-pip.done     { background: var(--green); }
+.step-pip.active   { background: var(--tagro); }
+.step-label {
+  font-size: 11px; font-weight: 900; color: var(--muted);
+  letter-spacing: .5px; text-transform: uppercase;
+  margin-top: 8px;
+}
+#step-name { color: var(--tagro); }
+
+/* ── SCREENS ───────────────────────────────────────────── */
+.screen { display: none; padding: 20px 20px calc(120px + var(--safe-bottom)); min-height: 100%; }
+.screen.active { display: block; }
+
+/* ── SECTION HEADER ────────────────────────────────────── */
+.section-title {
+  font-size: 22px; font-weight: 900; color: var(--text);
+  margin-bottom: 4px; line-height: 1.2;
+}
+.section-sub {
+  font-size: 14px; color: var(--muted); font-weight: 500;
+  margin-bottom: 24px; line-height: 1.4;
+}
+
+/* ── FIELD ─────────────────────────────────────────────── */
+.field { margin-bottom: 18px; }
+.field-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 900; color: var(--muted);
+  letter-spacing: .8px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.field-label .req { color: var(--tagro); }
+.field-label .opt {
+  font-size: 10px; font-weight: 700; color: #9ca3af;
+  letter-spacing: .3px; text-transform: uppercase;
+  background: #f3f4f6; padding: 2px 6px; border-radius: 4px;
+}
+
+input[type="text"], input[type="tel"], textarea, select {
+  width: 100%; padding: 14px 16px;
+  border: 2px solid var(--border); border-radius: 12px;
+  font-size: 16px; font-family: var(--font);
+  background: white; color: var(--text);
+  outline: none; transition: border-color .2s;
+  -webkit-appearance: none; appearance: none;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--tagro); }
+input.error, textarea.error { border-color: #ef4444; }
+textarea { resize: none; min-height: 80px; line-height: 1.5; }
+
+.field-hint {
+  font-size: 12px; color: var(--muted); margin-top: 6px;
+  font-weight: 500; line-height: 1.4;
+}
+.field-hint.warn { color: var(--warn); font-weight: 700; }
+
+/* ── COMPLAINT PILLS ───────────────────────────────────── */
+.pill-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 14px;
+}
+.pill {
+  padding: 9px 16px;
+  border: 2px solid var(--border); border-radius: 99px;
+  background: white; color: var(--text);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  user-select: none;
+}
+.pill:active { transform: scale(.95); }
+.pill.selected {
+  background: var(--tagro); border-color: var(--tagro); color: white;
+}
+
+/* ── CATEGORY GRID ─────────────────────────────────────── */
+.cat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 8px;
+}
+.cat-tile {
+  background: white; border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px 8px;
+  text-align: center; cursor: pointer;
+  transition: all .15s;
+}
+.cat-tile:active { transform: scale(.95); }
+.cat-tile.selected { border-color: var(--tagro); background: var(--tagro-light); }
+.cat-tile .cat-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+.cat-tile .cat-name {
+  font-size: 11px; font-weight: 800; color: var(--muted);
+  line-height: 1.2;
+}
+.cat-tile.selected .cat-name { color: var(--tagro-dark); }
+
+/* ── MODEL SELECT ──────────────────────────────────────── */
+#model-section { display: none; }
+.model-list {
+  border: 2px solid var(--border); border-radius: 12px;
+  background: white; overflow: hidden;
+}
+.model-option {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: background .12s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.model-option:last-child { border-bottom: none; }
+.model-option:active { background: var(--bg); }
+.model-option.selected { background: var(--tagro-light); color: var(--tagro-dark); }
+.model-option .check { color: var(--tagro); font-size: 18px; opacity: 0; }
+.model-option.selected .check { opacity: 1; }
+
+/* ── SERIAL BADGE ──────────────────────────────────────── */
+.serial-warn {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #fffbeb; border: 1.5px solid #fcd34d;
+  border-radius: 12px; padding: 12px 14px; margin-top: 8px;
+}
+.serial-warn-icon { font-size: 18px; flex: none; }
+.serial-warn-text { font-size: 13px; color: #78350f; font-weight: 600; line-height: 1.4; }
+
+/* ── PHOTO SECTION ─────────────────────────────────────── */
+.photo-area {
+  background: white; border: 2px dashed var(--border);
+  border-radius: 14px; padding: 20px;
+}
+.photo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin-bottom: 14px;
+}
+.photo-thumb {
+  aspect-ratio: 1; border-radius: 10px;
+  object-fit: cover; width: 100%;
+  background: var(--bg);
+}
+.photo-thumb.empty {
+  border: 2px dashed var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--border);
+}
+.btn-add-photo {
+  width: 100%; padding: 12px;
+  background: var(--bg); border: 2px solid var(--border);
+  border-radius: 12px; font-size: 14px; font-weight: 800;
+  color: var(--muted); cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-add-photo:active { background: var(--border); }
+#photo-input { display: none; }
+
+.photo-skip {
+  text-align: center; margin-top: 10px;
+  font-size: 13px; color: var(--muted); font-weight: 600;
+}
+
+/* ── CONFIRM SCREEN ────────────────────────────────────── */
+.confirm-card {
+  background: white; border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  margin-bottom: 14px; overflow: hidden;
+}
+.confirm-card-header {
+  padding: 12px 16px; background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 900; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.confirm-card-body { padding: 14px 16px; }
+.confirm-row {
+  display: flex; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.confirm-row:last-child { border-bottom: none; padding-bottom: 0; }
+.confirm-key {
+  font-size: 12px; font-weight: 800; color: var(--muted);
+  min-width: 80px; padding-top: 1px;
+  text-transform: uppercase; letter-spacing: .3px;
+}
+.confirm-val { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.4; }
+
+.edit-btn {
+  font-size: 12px; font-weight: 800; color: var(--tagro);
+  background: none; border: none; cursor: pointer; padding: 2px 4px;
+}
+
+.pills-summary {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.pill-sm {
+  font-size: 12px; font-weight: 700;
+  background: var(--tagro-light); color: var(--tagro-dark);
+  border-radius: 99px; padding: 4px 10px;
+}
+
+.confirm-photos {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.confirm-photo-thumb {
+  width: 56px; height: 56px; border-radius: 8px;
+  object-fit: cover;
+}
+
+/* ── NO SERIAL BADGE ON CONFIRM ────────────────────────── */
+.badge-warn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fffbeb; color: #78350f;
+  font-size: 11px; font-weight: 800;
+  border: 1px solid #fcd34d; border-radius: 99px;
+  padding: 3px 8px;
+}
+
+/* ── BOTTOM ACTIONS ────────────────────────────────────── */
+#action-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: white; border-top: 1px solid var(--border);
+  padding: 14px 20px calc(var(--safe-bottom) + 14px);
+  display: flex; gap: 10px; z-index: 20;
+}
+.btn-back {
+  padding: 14px 20px;
+  background: var(--bg); border: 2px solid var(--border);
+  border-radius: 14px; font-size: 15px; font-weight: 800;
+  color: var(--muted); cursor: pointer; flex: none;
+  transition: background .15s;
+}
+.btn-back:active { background: var(--border); }
+
+.btn-next {
+  flex: 1; padding: 16px;
+  background: var(--tagro); border: none;
+  border-radius: 14px; font-size: 17px; font-weight: 900;
+  color: white; cursor: pointer; transition: all .15s;
+  position: relative;
+}
+.btn-next:active { background: var(--tagro-dark); transform: scale(.98); }
+.btn-next:disabled {
+  background: var(--border); color: var(--muted); cursor: not-allowed;
+  transform: none;
+}
+.btn-next.green { background: var(--green); }
+.btn-next.green:active { background: #1e5c2f; }
+
+/* ── LOADING OVERLAY ───────────────────────────────────── */
+#saving-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(255,255,255,.9); backdrop-filter: blur(4px);
+  flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+}
+#saving-overlay.show { display: flex; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid var(--border);
+  border-top-color: var(--tagro);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.saving-msg { font-size: 16px; font-weight: 800; color: var(--text); }
+
+/* ── ERROR MSG ─────────────────────────────────────────── */
+.error-msg {
+  color: #dc2626; font-size: 13px; font-weight: 700;
+  margin-top: 6px; display: none;
+}
+.error-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS -->
+<div id="progress-bar">
+  <div class="steps">
+    <div class="step-pip active" id="pip-1"></div>
+    <div class="step-pip" id="pip-2"></div>
+    <div class="step-pip" id="pip-3"></div>
+    <div class="step-pip" id="pip-4"></div>
+  </div>
+  <div class="step-label">Step <span id="step-num">1</span> of 4 — <span id="step-name">Customer</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1 — CUSTOMER
+═══════════════════════════════════════ -->
+<div class="screen active" id="screen-customer">
+  <div class="section-title">Who brought the machine?</div>
+  <div class="section-sub">Customer name and phone are required before the machine can be accepted.</div>
+
+  <div class="field">
+    <div class="field-label">Customer Name <span class="req">*</span></div>
+    <input type="text" id="cust-name" placeholder="e.g. Rajan Varghese"
+      autocomplete="name" autocapitalize="words"
+      oninput="clearErr('cust-name')">
+    <div class="error-msg" id="err-cust-name">Please enter the customer name</div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Mobile Number <span class="req">*</span></div>
+    <input type="tel" id="cust-phone" placeholder="10-digit mobile number"
+      inputmode="numeric" maxlength="10"
+      oninput="this.value=this.value.replace(/[^0-9]/g,''); clearErr('cust-phone')"
+      onkeydown="if(event.key==='Enter') goNext()">
+    <div class="error-msg" id="err-cust-phone">Please enter a valid 10-digit number</div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Place <span class="opt">optional</span></div>
+    <input type="text" id="cust-place" placeholder="Village or town"
+      autocapitalize="words">
+  </div>
+
+  <div class="field">
+    <div class="field-label">Alternate Contact <span class="opt">optional</span></div>
+    <input type="tel" id="cust-alt" placeholder="Alternate number"
+      inputmode="numeric" maxlength="10"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2 — MACHINE
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-machine">
+  <div class="section-title">What is the machine?</div>
+  <div class="section-sub">Select category first, then the model.</div>
+
+  <div class="field">
+    <div class="field-label">Category <span class="req">*</span></div>
+    <div class="cat-grid" id="cat-grid">
+      <!-- rendered by JS -->
+    </div>
+    <div class="error-msg" id="err-category">Please select a category</div>
+  </div>
+
+  <div id="model-section">
+    <div class="field">
+      <div class="field-label">Model <span class="req">*</span></div>
+      <div class="model-list" id="model-list">
+        <!-- rendered by JS -->
+      </div>
+      <div class="error-msg" id="err-model">Please select a model</div>
+    </div>
+
+    <div class="field" id="serial-field">
+      <div class="field-label">Serial Number <span class="opt">optional</span></div>
+      <input type="text" id="machine-serial"
+        placeholder="e.g. 293892837"
+        autocapitalize="characters"
+        oninput="onSerialInput()">
+      <div class="serial-warn" id="serial-warn" style="display:none">
+        <span class="serial-warn-icon">⚠️</span>
+        <span class="serial-warn-text">Without a serial number, warranty tracking and repeat-repair detection will not work for this machine. Strongly recommended if visible on the machine.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 3 — COMPLAINT
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-complaint">
+  <div class="section-title">What is the complaint?</div>
+  <div class="section-sub">Tap the symptoms that apply. Add notes for anything specific.</div>
+
+  <div class="field">
+    <div class="field-label">Symptoms <span class="req">*</span></div>
+    <div class="pill-grid" id="symptom-pills">
+      <!-- rendered by JS -->
+    </div>
+    <div class="error-msg" id="err-complaint">Select at least one symptom or add a note</div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Additional Notes <span class="opt">optional</span></div>
+    <textarea id="complaint-notes"
+      placeholder="e.g. Stopped while cutting rubber. Chain came off twice."
+      rows="3"></textarea>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 4 — PHOTOS
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-photos">
+  <div class="section-title">Intake photographs</div>
+  <div class="section-sub">Document the machine's condition on arrival. This protects both the customer and the workshop.</div>
+
+  <div class="photo-area">
+    <div class="photo-grid" id="photo-grid">
+      <!-- populated as photos are added -->
+    </div>
+    <button class="btn-add-photo" onclick="triggerCamera()">
+      <span>📷</span> Add Photo
+    </button>
+    <input type="file" id="photo-input" accept="image/*" capture="environment"
+      multiple onchange="onPhotosSelected(event)">
+  </div>
+
+  <div class="photo-skip">Photos are optional. Tap <strong>Continue</strong> to skip.</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 5 — CONFIRM
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-confirm">
+  <div class="section-title">Everything look right?</div>
+  <div class="section-sub">Review before accepting the machine into the workshop.</div>
+
+  <!-- Customer card -->
+  <div class="confirm-card">
+    <div class="confirm-card-header">
+      Customer
+      <button class="edit-btn" onclick="goToScreen(1)">Edit</button>
+    </div>
+    <div class="confirm-card-body">
+      <div class="confirm-row">
+        <span class="confirm-key">Name</span>
+        <span class="confirm-val" id="cf-name">—</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-key">Phone</span>
+        <span class="confirm-val" id="cf-phone">—</span>
+      </div>
+      <div class="confirm-row" id="cf-place-row" style="display:none">
+        <span class="confirm-key">Place</span>
+        <span class="confirm-val" id="cf-place">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Machine card -->
+  <div class="confirm-card">
+    <div class="confirm-card-header">
+      Machine
+      <button class="edit-btn" onclick="goToScreen(2)">Edit</button>
+    </div>
+    <div class="confirm-card-body">
+      <div class="confirm-row">
+        <span class="confirm-key">Category</span>
+        <span class="confirm-val" id="cf-category">—</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-key">Model</span>
+        <span class="confirm-val" id="cf-model">—</span>
+      </div>
+      <div class="confirm-row">
+        <span class="confirm-key">Serial</span>
+        <span class="confirm-val" id="cf-serial">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaint card -->
+  <div class="confirm-card">
+    <div class="confirm-card-header">
+      Complaint
+      <button class="edit-btn" onclick="goToScreen(3)">Edit</button>
+    </div>
+    <div class="confirm-card-body">
+      <div class="confirm-row">
+        <span class="confirm-key">Symptoms</span>
+        <span class="confirm-val" id="cf-symptoms">—</span>
+      </div>
+      <div class="confirm-row" id="cf-notes-row" style="display:none">
+        <span class="confirm-key">Notes</span>
+        <span class="confirm-val" id="cf-notes">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photos card -->
+  <div class="confirm-card" id="cf-photos-card" style="display:none">
+    <div class="confirm-card-header">
+      Photos
+      <button class="edit-btn" onclick="goToScreen(4)">Edit</button>
+    </div>
+    <div class="confirm-card-body">
+      <div class="confirm-photos" id="cf-photos"></div>
+    </div>
+  </div>
+
+  <div class="error-msg show" id="err-save" style="display:none; margin-bottom:12px;"></div>
+</div>
+
+<!-- BOTTOM ACTION BAR -->
+<div id="action-bar">
+  <button class="btn-back" id="btn-back" onclick="goBack()" style="display:none">‹ Back</button>
+  <button class="btn-next" id="btn-next" onclick="goNext()">Continue</button>
+</div>
+
+<!-- SAVING OVERLAY -->
+<div id="saving-overlay">
+  <div class="spinner"></div>
+  <div class="saving-msg">Accepting into workshop…</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// TAGRO OS — app-receive.html
+// Thin client. Captures machine arrival. No business logic.
+// All persistence via Jobs.upsert() in os-core.js.
+// ══════════════════════════════════════════════════════════
+
+// ── CONFIGURATION ─────────────────────────────────────────
+// Complaint symptoms — structured for analytics, displayed as pills
+const SYMPTOMS = [
+  "Won't Start",
+  "No Power",
+  "Cutting Poorly",
+  "Fuel Leak",
+  "Oil Leak",
+  "Overheating",
+  "Unusual Noise",
+  "Vibration",
+  "Chain Won't Move",
+  "Rope Won't Pull",
+  "Smoke",
+  "Annual Service"
+];
+
+// Machine categories with emoji icons
+const CATEGORIES = [
+  { id: 'chainsaw',     label: 'Chainsaw',      icon: '🪚' },
+  { id: 'brushcutter',  label: 'Brushcutter',   icon: '🌿' },
+  { id: 'mistblower',   label: 'Mistblower',    icon: '💨' },
+  { id: 'sprayer',      label: 'Sprayer',       icon: '🚿' },
+  { id: 'hedgetrimmer', label: 'Hedge Trimmer', icon: '✂️' },
+  { id: 'polepruner',   label: 'Pole Pruner',   icon: '🌲' },
+  { id: 'battery',      label: 'Battery Tool',  icon: '🔋' },
+  { id: 'waterpump',    label: 'Water Pump',    icon: '💧' },
+  { id: 'generator',    label: 'Generator',     icon: '⚡' },
+  { id: 'other',        label: 'Other',         icon: '🔧' },
+];
+
+// ── STATE ─────────────────────────────────────────────────
+const State = {
+  currentScreen: 1,
+  totalScreens: 5,
+
+  customer: { name: '', phone: '', place: '', alt: '' },
+  machine:  { categoryId: '', categoryLabel: '', modelId: '', modelLabel: '', serial: '' },
+  complaint:{ symptoms: [], notes: '' },
+  photos:   [],    // Array of { dataUrl, file } — base64 for internal testing only
+                   // Production: upload to R2 before job save, store { r2Key, url } only
+
+  // Loaded from KV via os-core.js
+  models: [],
+};
+
+// ── BOOT ──────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  renderCategories();
+  renderSymptomPills();
+  renderPhotoGrid();
+  updateUI();
+  loadModels();
+  document.getElementById('cust-name').focus();
+});
+
+// Load models from the Knowledge Layer.
+// Knowledge.models() is storage-agnostic — returns from cache, KV, or bundle fallback.
+// No hardcoded model list here. All model data lives in the Knowledge service.
+function loadModels() {
+  try {
+    State.models = window.parent?.Knowledge?.models() || [];
+  } catch {
+    State.models = [];
+  }
+  // If Knowledge not yet loaded (standalone / cold start), models will populate
+  // when Knowledge.load() completes and the user selects a category.
+}
+
+// ── RENDER CATEGORIES ─────────────────────────────────────
+function renderCategories() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = CATEGORIES.map(c => `
+    <div class="cat-tile" id="cat-${c.id}" onclick="selectCategory('${c.id}','${esc(c.label)}')">
+      <span class="cat-icon">${c.icon}</span>
+      <span class="cat-name">${esc(c.label)}</span>
+    </div>
+  `).join('');
+}
+
+function selectCategory(id, label) {
+  State.machine.categoryId    = id;
+  State.machine.categoryLabel = label;
+  State.machine.modelId       = '';
+  State.machine.modelLabel    = '';
+
+  // Highlight selected category
+  document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('selected'));
+  document.getElementById('cat-' + id)?.classList.add('selected');
+  clearErr('category');
+
+  // Show and populate model list
+  const section = document.getElementById('model-section');
+  section.style.display = 'block';
+  renderModels(id);
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderModels(categoryId) {
+  const list = document.getElementById('model-list');
+  // Re-read from Knowledge each time — may have loaded since boot
+  try {
+    State.models = window.parent?.Knowledge?.models() || State.models;
+  } catch {}
+  const filtered = categoryId === 'other'
+    ? State.models.filter(m => m.category === 'other' || !m.category)
+    : State.models.filter(m => m.category === categoryId);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="model-option" style="color:var(--muted);cursor:default;">
+      No models found — select "Other / Not Listed"
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(m => `
+    <div class="model-option" id="model-${esc(m.id)}"
+      onclick="selectModel('${esc(m.id)}','${esc(m.label || m.name || m.id)}')">
+      <span>${esc(m.name || m.label || m.id)}</span>
+      <span class="check">✓</span>
+    </div>
+  `).join('');
+}
+
+function selectModel(id, label) {
+  State.machine.modelId    = id;
+  State.machine.modelLabel = label;
+  document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('model-' + id)?.classList.add('selected');
+  clearErr('model');
+}
+
+// ── SERIAL NUMBER ─────────────────────────────────────────
+function onSerialInput() {
+  const val = document.getElementById('machine-serial').value.trim();
+  State.machine.serial = val;
+  document.getElementById('serial-warn').style.display = val ? 'none' : 'flex';
+}
+
+// ── RENDER SYMPTOMS ───────────────────────────────────────
+function renderSymptomPills() {
+  const grid = document.getElementById('symptom-pills');
+  grid.innerHTML = SYMPTOMS.map(s => `
+    <div class="pill" data-symptom="${esc(s)}" onclick="toggleSymptom(this, '${esc(s)}')">
+      ${esc(s)}
+    </div>
+  `).join('');
+}
+
+function toggleSymptom(el, symptom) {
+  const idx = State.complaint.symptoms.indexOf(symptom);
+  if (idx >= 0) {
+    State.complaint.symptoms.splice(idx, 1);
+    el.classList.remove('selected');
+  } else {
+    State.complaint.symptoms.push(symptom);
+    el.classList.add('selected');
+  }
+  clearErr('complaint');
+}
+
+// ── PHOTOS ────────────────────────────────────────────────
+function triggerCamera() {
+  document.getElementById('photo-input').click();
+}
+
+// Photo limits — enforced before base64 encoding
+const PHOTO_MAX_COUNT = 5;
+const PHOTO_MAX_MB    = 4;    // per photo
+const PHOTO_MAX_BYTES = PHOTO_MAX_MB * 1024 * 1024;
+
+function onPhotosSelected(e) {
+  const files = Array.from(e.target.files || []);
+
+  for (const file of files) {
+    // Count limit
+    if (State.photos.length >= PHOTO_MAX_COUNT) {
+      showPhotoError(`Maximum ${PHOTO_MAX_COUNT} photos allowed`);
+      break;
+    }
+    // Type check
+    if (!file.type.startsWith('image/')) continue;
+    // Size limit
+    if (file.size > PHOTO_MAX_BYTES) {
+      showPhotoError(`Photo too large (max ${PHOTO_MAX_MB}MB). Please use a smaller image.`);
+      continue;
+    }
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      State.photos.push({
+        dataUrl: ev.target.result,
+        file,
+        // Extension point: after R2 upload, add { r2Key, url, uploadedAt }
+        // and clear dataUrl to avoid storing base64 in the job record
+        r2Key: null,
+        url:   null,
+      });
+      renderPhotoGrid();
+    };
+    reader.readAsDataURL(file);
+  }
+  // Reset input so same file can be re-selected if removed
+  e.target.value = '';
+}
+
+function showPhotoError(msg) {
+  let el = document.getElementById('photo-error');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'photo-error';
+    el.style.cssText = 'color:#dc2626;font-size:13px;font-weight:700;margin-top:8px;';
+    document.querySelector('.photo-area').appendChild(el);
+  }
+  el.textContent = msg;
+  setTimeout(() => { if (el) el.textContent = ''; }, 3000);
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photo-grid');
+  if (!State.photos.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = State.photos.map((p, i) => `
+    <div style="position:relative;">
+      <img class="photo-thumb" src="${p.dataUrl}" alt="Photo ${i+1}">
+      <button onclick="removePhoto(${i})" style="
+        position:absolute; top:4px; right:4px;
+        width:22px; height:22px; border-radius:50%;
+        background:rgba(0,0,0,.6); border:none; color:white;
+        font-size:12px; cursor:pointer; display:flex;
+        align-items:center; justify-content:center; font-weight:900;">✕</button>
+    </div>
+  `).join('');
+}
+
+function removePhoto(idx) {
+  State.photos.splice(idx, 1);
+  renderPhotoGrid();
+}
+
+// ── CONFIRM SCREEN ────────────────────────────────────────
+function populateConfirm() {
+  // Customer
+  document.getElementById('cf-name').textContent  = State.customer.name;
+  document.getElementById('cf-phone').textContent = State.customer.phone;
+  const placeRow = document.getElementById('cf-place-row');
+  if (State.customer.place) {
+    placeRow.style.display = 'flex';
+    document.getElementById('cf-place').textContent = State.customer.place;
+  } else {
+    placeRow.style.display = 'none';
+  }
+
+  // Machine
+  document.getElementById('cf-category').textContent = State.machine.categoryLabel;
+  document.getElementById('cf-model').textContent    = State.machine.modelLabel;
+
+  const serialEl = document.getElementById('cf-serial');
+  if (State.machine.serial) {
+    serialEl.textContent = State.machine.serial;
+  } else {
+    serialEl.innerHTML = '<span class="badge-warn">⚠ No serial number</span>';
+  }
+
+  // Complaint
+  const symptomsEl = document.getElementById('cf-symptoms');
+  if (State.complaint.symptoms.length) {
+    symptomsEl.innerHTML = '<div class="pills-summary">' +
+      State.complaint.symptoms.map(s => `<span class="pill-sm">${esc(s)}</span>`).join('') +
+      '</div>';
+  } else {
+    symptomsEl.textContent = '—';
+  }
+
+  const notesRow = document.getElementById('cf-notes-row');
+  if (State.complaint.notes) {
+    notesRow.style.display = 'flex';
+    document.getElementById('cf-notes').textContent = State.complaint.notes;
+  } else {
+    notesRow.style.display = 'none';
+  }
+
+  // Photos
+  const photosCard = document.getElementById('cf-photos-card');
+  if (State.photos.length) {
+    photosCard.style.display = 'block';
+    document.getElementById('cf-photos').innerHTML = State.photos.map(p =>
+      `<img class="confirm-photo-thumb" src="${p.dataUrl}">`
+    ).join('');
+  } else {
+    photosCard.style.display = 'none';
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────
+const SCREEN_NAMES = ['', 'Customer', 'Machine', 'Complaint', 'Photos', 'Confirm'];
+
+function goToScreen(n) {
+  if (n < 1 || n > State.totalScreens) return;
+  State.currentScreen = n;
+  updateUI();
+  window.scrollTo(0, 0);
+}
+
+function goNext() {
+  if (!validateCurrent()) return;
+
+  // Capture current screen's data into State
+  captureScreen(State.currentScreen);
+
+  if (State.currentScreen === State.totalScreens) {
+    saveJob();
+    return;
+  }
+  goToScreen(State.currentScreen + 1);
+}
+
+function goBack() {
+  if (State.currentScreen > 1) goToScreen(State.currentScreen - 1);
+}
+
+function updateUI() {
+  const n = State.currentScreen;
+
+  // Screens
+  document.querySelectorAll('.screen').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === n);
+  });
+
+  // Progress pips
+  for (let i = 1; i <= 4; i++) {
+    const pip = document.getElementById('pip-' + i);
+    if (!pip) continue;
+    pip.classList.remove('done','active');
+    if (i < n)      pip.classList.add('done');
+    else if (i === n) pip.classList.add('active');
+  }
+
+  document.getElementById('step-num').textContent  = n;
+  document.getElementById('step-name').textContent = SCREEN_NAMES[n] || '';
+
+  // Back button
+  document.getElementById('btn-back').style.display = n > 1 ? 'block' : 'none';
+
+  // Next button label
+  const btnNext = document.getElementById('btn-next');
+  if (n === State.totalScreens) {
+    btnNext.textContent = '✓ Accept into Workshop';
+    btnNext.classList.add('green');
+  } else if (n === 4) {
+    btnNext.textContent = 'Continue';
+    btnNext.classList.remove('green');
+  } else {
+    btnNext.textContent = 'Continue';
+    btnNext.classList.remove('green');
+  }
+
+  // Populate confirm screen when reaching it
+  if (n === State.totalScreens) populateConfirm();
+
+  // Show serial warning if no serial when on machine screen
+  if (n === 2) {
+    const warn = document.getElementById('serial-warn');
+    if (warn && !State.machine.serial) {
+      warn.style.display = State.machine.modelId ? 'flex' : 'none';
+    }
+  }
+}
+
+function captureScreen(n) {
+  if (n === 1) {
+    State.customer.name  = document.getElementById('cust-name').value.trim();
+    State.customer.phone = document.getElementById('cust-phone').value.trim();
+    State.customer.place = document.getElementById('cust-place').value.trim();
+    State.customer.alt   = document.getElementById('cust-alt').value.trim();
+  }
+  if (n === 2) {
+    State.machine.serial = document.getElementById('machine-serial').value.trim();
+  }
+  if (n === 3) {
+    State.complaint.notes = document.getElementById('complaint-notes').value.trim();
+  }
+}
+
+// ── VALIDATION ────────────────────────────────────────────
+function validateCurrent() {
+  const n = State.currentScreen;
+
+  if (n === 1) {
+    const name  = document.getElementById('cust-name').value.trim();
+    const phone = document.getElementById('cust-phone').value.trim();
+    let ok = true;
+    if (!name)  { showErr('cust-name');  ok = false; }
+    if (!phone || phone.length !== 10) { showErr('cust-phone'); ok = false; }
+    return ok;
+  }
+
+  if (n === 2) {
+    let ok = true;
+    if (!State.machine.categoryId) { showErr('category'); ok = false; }
+    else if (!State.machine.modelId) { showErr('model');    ok = false; }
+    return ok;
+  }
+
+  if (n === 3) {
+    const notes = document.getElementById('complaint-notes').value.trim();
+    if (!State.complaint.symptoms.length && !notes) {
+      showErr('complaint');
+      return false;
+    }
+    return true;
+  }
+
+  // Screens 4 and 5 have no required fields
+  return true;
+}
+
+function showErr(id) {
+  const el = document.getElementById('err-' + id);
+  if (el) el.classList.add('show');
+  const inp = document.getElementById(id) || document.getElementById('cust-' + id);
+  if (inp) inp.classList.add('error');
+}
+
+function clearErr(id) {
+  const el = document.getElementById('err-' + id);
+  if (el) el.classList.remove('show');
+  const inp = document.getElementById(id) || document.getElementById('cust-' + id);
+  if (inp) inp.classList.remove('error');
+}
+
+// ── SAVE JOB ──────────────────────────────────────────────
+// The only communication this app has with the OS.
+// Jobs.upsert() handles all persistence, sync, and Guardian handoff.
+async function saveJob() {
+  const errEl = document.getElementById('err-save');
+  errEl.style.display = 'none';
+
+  // Show saving overlay
+  document.getElementById('saving-overlay').classList.add('show');
+
+  try {
+    // Get session from parent OS
+    let session = null;
+    try { session = window.parent?.Session?.get(); } catch {}
+
+    // Build the job object
+    // Work order strategy: client generates a temporary intake ID immediately
+    // so the job can be displayed and referenced while saving.
+    // The Worker assigns the final sequential work order number on first sync.
+    // When the Worker confirms, Jobs.upsert() will update workOrder in place.
+    // This prevents duplicate numbers across devices on the same branch/month.
+    const branch = session?.branch || 'UNK';
+    const jobId  = 'job_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    const workOrder = 'INTAKE-' + branch + '-' + Date.now().toString(36).toUpperCase();
+    // Note: final WO number (e.g. KVR/2606/001) is assigned by the Worker
+    // via POST /jobs/create which returns the confirmed work order number.
+
+    // Build complaints string for backward compatibility
+    const complaintsText = [
+      ...State.complaint.symptoms,
+      State.complaint.notes
+    ].filter(Boolean).join('; ');
+
+    const job = {
+      id:         jobId,
+      workOrder:  workOrder,
+      branch:     session?.branch     || 'UNK',
+      branchName: session?.branchName || '',
+      createdAt:  new Date().toISOString(),
+      createdBy:  session?.name       || 'Unknown',
+
+      customer: {
+        name:  State.customer.name,
+        phone: State.customer.phone,
+        place: State.customer.place  || '',
+        alt:   State.customer.alt    || '',
+      },
+
+      machine: {
+        categoryId:    State.machine.categoryId,
+        categoryLabel: State.machine.categoryLabel,
+        modelId:       State.machine.modelId,
+        model:         State.machine.modelLabel,   // display name from Knowledge
+        serial:        State.machine.serial || '',
+        hasSerial:     !!State.machine.serial,
+      },
+
+      complaints: State.complaint.symptoms,     // structured array
+      complaint:  complaintsText,               // string for display/search
+      notes:      State.complaint.notes || '',
+
+      // Photos: base64 dataUrl used for internal/prototype only.
+      // Production path: upload each photo to R2 via Worker /r2-put before
+      // calling Jobs.upsert(), then store { r2Key, url } only — not dataUrl.
+      // The job should never contain base64 in production (too large for D1/Dropbox).
+      photoCount: State.photos.length,
+      photos: State.photos.map((p, i) => ({
+        index:     i,
+        r2Key:     p.r2Key  || null,   // null until R2 upload is implemented
+        url:       p.url    || null,   // null until R2 upload is implemented
+        dataUrl:   p.r2Key  ? null : p.dataUrl,  // cleared once R2 key exists
+      })),
+
+      // Timeline — first immutable event
+      timeline: [
+        {
+          type:      'machine_received',
+          at:        new Date().toISOString(),
+          by:        session?.name   || 'Unknown',
+          branch:    session?.branch || 'UNK',
+          // Snapshot of intake data for the record
+          snapshot: {
+            customer:  State.customer.name,
+            phone:     State.customer.phone,
+            model:     State.machine.modelLabel,
+            serial:    State.machine.serial || null,
+            symptoms:  State.complaint.symptoms,
+            notes:     State.complaint.notes || null,
+          }
+        }
+      ]
+    };
+
+    // ── CUSTOMER INDEX (Extension Point) ────────────────────────────────
+    // Update the OS customer index so this customer is findable in future jobs.
+    // Customers.upsert() is called before Jobs.upsert() so the index is current
+    // even if the job save fails partway through.
+    try {
+      const customerRecord = {
+        id:     'cust_' + State.customer.phone, // phone as stable identifier
+        name:   State.customer.name,
+        phone:  State.customer.phone,
+        place:  State.customer.place  || '',
+        alt:    State.customer.alt    || '',
+        branch: branch,
+        // lastSeen updated on each visit — allows customer history lookup
+        lastSeen: new Date().toISOString(),
+      };
+      window.parent?.Customers?.upsert(customerRecord);
+    } catch {
+      // Customer index failure must never block the job save
+      // Log silently — the job is more important than the index
+    }
+
+    // ── HAND TO OS — the only persistence call this app makes ─────────────
+    let saved;
+    try {
+      saved = await window.parent?.Jobs?.upsert(job);
+    } catch (e) {
+      throw new Error('Could not save job. Please try again.');
+    }
+
+    if (!saved) throw new Error('Job was not saved. Please try again.');
+
+    // Success — notify OS and close
+    document.getElementById('saving-overlay').classList.remove('show');
+
+    // Notify parent OS of success
+    try {
+      window.parent?.Notifications?.add(
+        `${State.customer.name} — ${State.machine.modelLabel} accepted into workshop`,
+        'internal'
+      );
+    } catch {}
+
+    // Close this app and return to home
+    try {
+      window.parent?.AppLauncher?.close();
+      window.parent?.Toast?.show(`${workOrder} — ${State.machine.modelLabel} received ✓`);
+    } catch {}
+
+  } catch (err) {
+    document.getElementById('saving-overlay').classList.remove('show');
+    // Calm failure — never expose internal errors to staff
+    errEl.textContent = err.message || 'Unable to complete. Please try again.';
+    errEl.style.display = 'block';
+    document.getElementById('btn-next').textContent = '✓ Accept into Workshop';
+  }
+}
+
+// ── UTILITY ───────────────────────────────────────────────
+function esc(s) {
+  return s == null ? '' : String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TAGRO — Login</title>
+<link rel="stylesheet" href="os-shell.css">
+<script src="os-manifest.js"></script>
+<script src="os-core.js"></script>
+<style>
+body { display:flex; align-items:center; justify-content:center; min-height:100vh;
+  background: linear-gradient(160deg,#1a1a2e 0%,#0f3460 100%); overflow:auto; }
+
+.login-wrap { width:100%; max-width:380px; padding:32px 24px; padding-top:calc(env(safe-area-inset-top,0px)+32px); }
+
+.brand { text-align:center; margin-bottom:40px; }
+.brand-mark { font-size:48px; font-weight:900; font-style:italic; color:white; letter-spacing:-3px; line-height:1; }
+.brand-mark span { color:#df6427; font-style:normal; }
+.brand-sub { font-size:11px; font-weight:900; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,.4); margin-top:8px; }
+
+.card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  border-radius:24px; padding:28px 24px; backdrop-filter:blur(20px); }
+
+.card-title { font-size:12px; font-weight:900; color:rgba(255,255,255,.4); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:24px; }
+
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:11px; font-weight:900; color:rgba(255,255,255,.5);
+  letter-spacing:.8px; text-transform:uppercase; margin-bottom:8px; }
+.field select, .field input {
+  width:100%; padding:14px 16px; border:1.5px solid rgba(255,255,255,.12);
+  border-radius:14px; font-size:16px; font-family:inherit;
+  background:rgba(255,255,255,.08); color:white; outline:none;
+  transition:border-color .2s; }
+.field select:focus, .field input:focus { border-color:#df6427; }
+.field select option { background:#1a1a2e; color:white; }
+
+.btn-primary { width:100%; padding:16px; background:#df6427; color:white;
+  border:none; border-radius:14px; font-size:17px; font-weight:900;
+  cursor:pointer; transition:background .2s; margin-top:8px; }
+.btn-primary:active { background:#b84e1c; transform:scale(.98); }
+
+.btn-ghost { width:100%; padding:14px; background:rgba(255,255,255,.07);
+  color:rgba(255,255,255,.7); border:1.5px solid rgba(255,255,255,.1);
+  border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; margin-top:8px; }
+.btn-ghost:active { background:rgba(255,255,255,.15); }
+
+.divider { text-align:center; color:rgba(255,255,255,.25); font-size:12px; margin:14px 0; }
+.error { color:#f87171; font-size:13px; text-align:center; margin-top:10px; min-height:18px; }
+
+.otp-hint { font-size:14px; color:rgba(255,255,255,.65); text-align:center;
+  margin-bottom:20px; line-height:1.6; }
+.otp-hint strong { color:#df6427; }
+
+.step { display:none; }
+.step.active { display:block; }
+
+.pin-wrap { position:relative; }
+.pin-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  background:none; border:none; cursor:pointer; font-size:18px; color:rgba(255,255,255,.4); }
+
+.owner-row { text-align:center; margin-top:20px; }
+.owner-btn { background:none; border:none; color:rgba(255,255,255,.3);
+  font-size:13px; cursor:pointer; text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="brand">
+    <div class="brand-mark"><span>▰</span>TAGRO</div>
+    <div class="brand-sub">Operating System</div>
+  </div>
+
+  <div class="card">
+
+    <!-- STEP 1: Branch + Staff -->
+    <div class="step active" id="step-select">
+      <div class="card-title">Staff Login</div>
+
+      <div class="field">
+        <label>Branch</label>
+        <select id="branch-sel" onchange="onBranchChange()">
+          <option value="">Select branch</option>
+        </select>
+      </div>
+
+      <div class="field" id="staff-field" style="display:none">
+        <label>Your Name</label>
+        <select id="staff-sel" onchange="onStaffChange()">
+          <option value="">Select your name</option>
+        </select>
+      </div>
+
+      <div class="field" id="pin-field" style="display:none">
+        <label>PIN</label>
+        <div class="pin-wrap">
+          <input type="password" inputmode="numeric" maxlength="6" id="pin-input"
+            placeholder="• • • • • •"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+            onkeydown="if(event.key==='Enter')doLogin()">
+          <button class="pin-toggle" onclick="togglePin()">👁</button>
+        </div>
+      </div>
+
+      <div class="error" id="pin-error"></div>
+
+      <button class="btn-primary" id="btn-login" style="display:none" onclick="doLogin()">
+        Enter TAGRO OS
+      </button>
+
+      <div class="divider" id="otp-div" style="display:none">or</div>
+      <button class="btn-ghost" id="btn-otp" style="display:none" onclick="requestOTP()">
+        Send PIN by SMS
+      </button>
+    </div>
+
+    <!-- STEP 2: OTP entry -->
+    <div class="step" id="step-otp">
+      <div class="card-title">Verify Phone</div>
+      <div class="otp-hint">Code sent to <strong id="otp-phone">your phone</strong></div>
+      <div class="field">
+        <label>6-Digit Code</label>
+        <input type="tel" inputmode="numeric" maxlength="6" id="otp-input"
+          placeholder="_ _ _ _ _ _" style="letter-spacing:8px;font-size:24px;text-align:center;"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+          onkeydown="if(event.key==='Enter')verifyOTP()">
+      </div>
+      <div class="error" id="otp-error"></div>
+      <button class="btn-primary" onclick="verifyOTP()">Verify & Enter</button>
+      <button class="btn-ghost" onclick="showStep('step-select')">← Back</button>
+    </div>
+
+  </div>
+
+  <div class="owner-row">
+    <button class="owner-btn" onclick="ownerLogin()">Owner access</button>
+  </div>
+</div>
+
+<div id="os-toast"></div>
+
+<script>
+const API = TAGRO_MANIFEST.api; // single source of truth — defined in os-manifest.js
+
+// Redirect if already logged in
+if (Session.valid()) location.href = 'index.html';
+
+// Check expired flag
+if (new URLSearchParams(location.search).get('expired')) {
+  Toast.show('Session expired — please login again');
+}
+
+// ── POPULATE BRANCH ───────────────────────────────────────
+(function populateBranches() {
+  const sel = document.getElementById('branch-sel');
+  Object.entries(TAGRO_MANIFEST.branches).forEach(([code, name]) => {
+    const o = document.createElement('option');
+    o.value = code; o.textContent = `${code} — ${name}`;
+    sel.appendChild(o);
+  });
+  // Try to restore last branch
+  const last = OS.get('tagro_last_branch');
+  if (last) { sel.value = last; onBranchChange(); }
+})();
+
+function onBranchChange() {
+  const branch = document.getElementById('branch-sel').value;
+  OS.set('tagro_last_branch', branch);
+  const staffField = document.getElementById('staff-field');
+  const staffSel   = document.getElementById('staff-sel');
+  if (!branch) { staffField.style.display = 'none'; return; }
+  staffField.style.display = 'block';
+
+  // Load staff from KV cache or fallback to manifest
+  const kv = OS.get('tagro_kv_staff', []);
+  const branchStaff = kv.filter(s => s.branch === branch && s.active !== false);
+
+  staffSel.innerHTML = '<option value="">Select your name</option>';
+  branchStaff.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.name; o.textContent = s.name + (s.role === 'Manager' ? ' (Manager)' : '');
+    staffSel.appendChild(o);
+  });
+  // Always offer Demo
+  const demo = document.createElement('option'); demo.value='Demo'; demo.textContent='Demo (Practice)'; staffSel.appendChild(demo);
+
+  document.getElementById('pin-field').style.display = 'none';
+  document.getElementById('btn-login').style.display = 'none';
+  document.getElementById('otp-div').style.display = 'none';
+  document.getElementById('btn-otp').style.display = 'none';
+}
+
+function onStaffChange() {
+  const name = document.getElementById('staff-sel').value;
+  if (!name) return;
+  document.getElementById('pin-field').style.display = 'block';
+  document.getElementById('btn-login').style.display = 'block';
+  if (name !== 'Demo') {
+    document.getElementById('otp-div').style.display = 'block';
+    document.getElementById('btn-otp').style.display = 'block';
+  }
+  document.getElementById('pin-input').focus();
+}
+
+function togglePin() {
+  const inp = document.getElementById('pin-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── LOGIN ─────────────────────────────────────────────────
+async function doLogin() {
+  const branch = document.getElementById('branch-sel').value;
+  const name   = document.getElementById('staff-sel').value;
+  const pin    = document.getElementById('pin-input').value;
+  const errEl  = document.getElementById('pin-error');
+  errEl.textContent = '';
+
+  if (!branch || !name) { errEl.textContent = 'Select branch and name'; return; }
+
+  // Demo mode
+  if (name === 'Demo') {
+    Session.set({ name:'Demo', branch, branchName: TAGRO_MANIFEST.branches[branch], role:'Staff', demo:true });
+    location.href = 'index.html'; return;
+  }
+
+  if (!pin || pin.length < 4) { errEl.textContent = 'Enter your PIN'; return; }
+
+  // Check local PIN hash
+  const key = `pin_${branch}_${name.replace(/\s+/g,'_')}`;
+  const stored = OS.get(key, null);
+
+  if (!stored) {
+    // First time — set PIN
+    const hashed = await hashPin(pin);
+    OS.set(key, hashed);
+    loginSuccess(name, branch, getStaffRole(name, branch));
+    return;
+  }
+
+  const hashed = await hashPin(pin);
+  if (hashed !== stored) { errEl.textContent = 'Wrong PIN. Try SMS code instead.'; return; }
+  loginSuccess(name, branch, getStaffRole(name, branch));
+}
+
+async function hashPin(pin) {
+  const txt = new TextEncoder().encode(pin + '|tagro-os-v1');
+  const buf = await crypto.subtle.digest('SHA-256', txt);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function getStaffRole(name, branch) {
+  const kv = OS.get('tagro_kv_staff', []);
+  const found = kv.find(s => s.name === name && s.branch === branch);
+  return found?.role || 'Staff';
+}
+
+function loginSuccess(name, branch, role) {
+  Session.set({ name, branch, branchName: TAGRO_MANIFEST.branches[branch], role });
+  // Background: activate device
+  fetch(`${API}/device/activate`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, branch, deviceId: getDeviceId(), deviceInfo: navigator.userAgent.slice(0,80) })
+  }).catch(()=>{});
+  // Load KV config in background
+  KVConfig.load().catch(()=>{});
+  location.href = 'index.html';
+}
+
+// ── OTP ───────────────────────────────────────────────────
+async function requestOTP() {
+  const name   = document.getElementById('staff-sel').value;
+  const branch = document.getElementById('branch-sel').value;
+  document.getElementById('pin-error').textContent = 'Sending…';
+  try {
+    const res  = await fetch(`${API}/auth/otp-send`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, branch })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('otp-phone').textContent = data.masked;
+      showStep('step-otp');
+      document.getElementById('otp-input').focus();
+    } else {
+      document.getElementById('pin-error').textContent = data.error || 'Could not send SMS';
+    }
+  } catch {
+    document.getElementById('pin-error').textContent = 'Network error — check connection';
+  }
+}
+
+async function verifyOTP() {
+  const name   = document.getElementById('staff-sel').value;
+  const branch = document.getElementById('branch-sel').value;
+  const otp    = document.getElementById('otp-input').value;
+  const errEl  = document.getElementById('otp-error');
+  if (otp.length !== 6) { errEl.textContent = 'Enter the 6-digit code'; return; }
+  errEl.textContent = 'Verifying…';
+  try {
+    const res  = await fetch(`${API}/auth/otp-verify`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, branch, otp })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      loginSuccess(name, branch, data.member?.role || 'Staff');
+    } else {
+      errEl.textContent = data.reason === 'expired' ? 'Code expired — request again' :
+                          data.reason === 'blocked'  ? 'Too many attempts — wait 10 min' :
+                          `Wrong code (${data.attemptsLeft} left)`;
+    }
+  } catch {
+    errEl.textContent = 'Network error';
+  }
+}
+
+// ── OWNER ─────────────────────────────────────────────────
+async function ownerLogin() {
+  const pin = prompt('Owner PIN:');
+  if (!pin) return;
+  const key    = 'pin_owner_tmthomas';
+  const stored = OS.get(key, null);
+  if (!stored) {
+    const c = prompt('Set owner PIN (first time — confirm):');
+    if (!c || c !== pin) { alert('PINs did not match'); return; }
+    OS.set(key, await hashPin(pin));
+    Toast.show('Owner PIN set');
+  } else {
+    if (await hashPin(pin) !== stored) { Toast.show('Wrong PIN'); return; }
+  }
+  Session.set({ name:'T M Thomas', phone:'9656361846', branch:'ALL', branchName:'All Branches', role:'Owner', loginAt: new Date().toISOString() });
+  location.href = 'index.html';
+}
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Load KV staff in background so branch staff list is populated
+KVConfig.load().catch(()=>{});
+</script>
+</body>
+</html>

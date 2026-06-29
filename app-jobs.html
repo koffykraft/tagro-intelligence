@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Jobs — TAGRO OS</title>
+<style>
+/* ── JOBS APP STYLES ────────────────────────────────────────
+   Self-contained. Never imports os-shell.css.
+   Designed for the OS desktop — feels like a workshop counter,
+   not a traditional web list. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --tagro:       #df6427;
+  --tagro-dark:  #b84e1c;
+  --tagro-light: #fff7ed;
+  --green:       #287a3e;
+  --green-light: #f0fdf4;
+  --blue:        #2563eb;
+  --blue-light:  #eff6ff;
+  --amber:       #b45309;
+  --amber-light: #fffbeb;
+  --red:         #dc2626;
+  --red-light:   #fef2f2;
+  --slate:       #475569;
+  --surface:     #ffffff;
+  --bg:          #f0ede8;
+  --text:        #121212;
+  --muted:       #6b7280;
+  --border:      #e5e7eb;
+  --font:        -apple-system, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --radius:      16px;
+}
+
+html, body {
+  height: 100%; background: var(--bg);
+  font-family: var(--font); color: var(--text);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+#app-header {
+  position: sticky; top: 0; z-index: 20;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+}
+
+.header-row {
+  display: flex; align-items: center;
+  gap: 10px; margin-bottom: 10px;
+}
+
+.header-title {
+  font-size: 20px; font-weight: 900;
+  color: var(--text); flex: 1;
+}
+
+#btn-new-job {
+  background: var(--tagro); color: white;
+  border: none; border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 14px; font-weight: 900;
+  cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  transition: background .15s;
+}
+#btn-new-job:active { background: var(--tagro-dark); transform: scale(.97); }
+
+/* ── SEARCH + FILTER ────────────────────────────────────── */
+.search-row {
+  display: flex; gap: 8px; align-items: center;
+}
+
+#search-input {
+  flex: 1; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: 15px; font-family: var(--font);
+  background: var(--bg); color: var(--text);
+  outline: none; transition: border-color .2s;
+}
+#search-input:focus { border-color: var(--tagro); background: white; }
+
+#filter-btn {
+  padding: 10px 14px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 13px; font-weight: 800;
+  color: var(--muted); cursor: pointer; white-space: nowrap;
+  transition: all .15s;
+}
+#filter-btn.active {
+  background: var(--tagro-light);
+  border-color: var(--tagro);
+  color: var(--tagro-dark);
+}
+#filter-btn:active { transform: scale(.97); }
+
+/* ── FILTER CHIPS ───────────────────────────────────────── */
+#filter-chips {
+  display: none;
+  gap: 6px; padding: 10px 16px 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+#filter-chips.open { display: flex; }
+#filter-chips::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  flex: none; padding: 6px 14px;
+  border: 1.5px solid var(--border); border-radius: 99px;
+  background: white; color: var(--muted);
+  font-size: 12px; font-weight: 800; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.filter-chip.active {
+  border-color: var(--tagro); background: var(--tagro-light);
+  color: var(--tagro-dark);
+}
+.filter-chip:active { transform: scale(.95); }
+
+/* ── STATS BAR ──────────────────────────────────────────── */
+#stats-bar {
+  display: flex; gap: 0;
+  background: white; border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none;
+}
+#stats-bar::-webkit-scrollbar { display: none; }
+
+.stat-pill {
+  flex: none; padding: 10px 16px;
+  text-align: center; cursor: pointer;
+  border-right: 1px solid var(--border);
+  transition: background .15s; white-space: nowrap;
+}
+.stat-pill:last-child { border-right: none; }
+.stat-pill:active { background: var(--bg); }
+.stat-pill.active { background: var(--tagro-light); }
+
+.stat-num {
+  display: block; font-size: 20px; font-weight: 900;
+  line-height: 1; color: var(--text);
+}
+.stat-num.orange { color: var(--tagro); }
+.stat-num.green  { color: var(--green); }
+.stat-num.amber  { color: var(--amber); }
+.stat-num.red    { color: var(--red);   }
+
+.stat-label {
+  display: block; font-size: 10px; font-weight: 800;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: .5px; margin-top: 2px;
+}
+
+/* ── JOB LIST ───────────────────────────────────────────── */
+#job-list {
+  padding: 12px 16px calc(80px + var(--safe-bottom));
+}
+
+.empty-state {
+  text-align: center; padding: 48px 24px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 18px; font-weight: 900; margin-bottom: 8px; color: var(--text); }
+.empty-sub { font-size: 14px; line-height: 1.5; }
+
+/* ── JOB CARD ───────────────────────────────────────────── */
+.job-card {
+  background: white; border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  margin-bottom: 10px; overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+  cursor: pointer;
+}
+.job-card:active {
+  border-color: var(--tagro);
+  box-shadow: 0 0 0 3px var(--tagro-light);
+}
+
+/* Status colour strip on left edge */
+.job-card-inner {
+  display: flex; gap: 0;
+}
+.status-strip {
+  width: 4px; flex: none;
+  border-radius: 0;
+}
+
+.job-card-body {
+  flex: 1; padding: 14px 14px 12px;
+  min-width: 0;
+}
+
+/* Top row: WO + age */
+.job-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 8px;
+  margin-bottom: 6px;
+}
+.job-wo {
+  font-size: 13px; font-weight: 900;
+  color: var(--tagro); letter-spacing: .3px;
+  white-space: nowrap;
+}
+.job-age {
+  font-size: 11px; font-weight: 700;
+  color: var(--muted); white-space: nowrap;
+}
+.job-age.warn { color: var(--amber); }
+.job-age.urgent { color: var(--red); font-weight: 900; }
+
+/* Customer and machine */
+.job-customer {
+  font-size: 16px; font-weight: 900;
+  color: var(--text); margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.job-machine {
+  font-size: 13px; font-weight: 700; color: var(--muted);
+  margin-bottom: 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Status + action row */
+.job-footer {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 8px;
+}
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 900;
+  text-transform: uppercase; letter-spacing: .4px;
+  white-space: nowrap;
+}
+
+.action-btn {
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 12px; font-weight: 900;
+  border: none; cursor: pointer;
+  white-space: nowrap; transition: all .15s;
+}
+.action-btn:active { transform: scale(.95); }
+
+/* ── STATUS COLOURS ─────────────────────────────────────── */
+.s-received        { background: #f0f9ff; color: #0369a1; }
+.s-inspecting      { background: #faf5ff; color: #7c3aed; }
+.s-repairing       { background: var(--green-light); color: var(--green); }
+.s-onhold          { background: var(--amber-light); color: var(--amber); }
+.s-waitingparts    { background: var(--amber-light); color: var(--amber); }
+.s-awaitingapproval{ background: var(--blue-light);  color: var(--blue);  }
+.s-ready           { background: var(--green-light); color: var(--green); }
+.s-delivered       { background: #f8fafc; color: var(--slate); }
+
+/* Strip colours */
+.strip-received        { background: #0369a1; }
+.strip-inspecting      { background: #7c3aed; }
+.strip-repairing       { background: var(--green); }
+.strip-onhold          { background: var(--amber); }
+.strip-waitingparts    { background: var(--amber); }
+.strip-awaitingapproval{ background: var(--blue);  }
+.strip-ready           { background: var(--green); }
+.strip-delivered       { background: var(--slate); }
+
+/* Action button colours */
+.ab-inspect  { background: #f0e6ff; color: #7c3aed; }
+.ab-work     { background: var(--green-light); color: var(--green); }
+.ab-approval { background: var(--blue-light);  color: var(--blue);  }
+.ab-view     { background: var(--bg); color: var(--muted); }
+.ab-deliver  { background: var(--tagro-light); color: var(--tagro-dark); }
+
+/* ── SYNC STATUS ────────────────────────────────────────── */
+#sync-bar {
+  display: none;
+  padding: 8px 16px;
+  background: var(--amber-light);
+  border-bottom: 1px solid #fde68a;
+  font-size: 12px; font-weight: 700; color: var(--amber);
+  text-align: center;
+}
+#sync-bar.show { display: block; }
+
+/* ── PULL TO REFRESH HINT ───────────────────────────────── */
+#refresh-hint {
+  text-align: center; padding: 12px;
+  font-size: 12px; color: var(--muted); font-weight: 600;
+  display: none;
+}
+
+/* ── LOADING ────────────────────────────────────────────── */
+#loading {
+  text-align: center; padding: 48px 24px;
+  color: var(--muted); font-size: 14px; font-weight: 700;
+}
+.spinner-sm {
+  display: inline-block; width: 20px; height: 20px;
+  border: 3px solid var(--border); border-top-color: var(--tagro);
+  border-radius: 50%; animation: spin .8s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="app-header">
+  <div class="header-row">
+    <span class="header-title">Jobs</span>
+    <button id="btn-new-job" onclick="openReceive()">
+      <span>＋</span> New Job
+    </button>
+  </div>
+  <div class="search-row">
+    <input type="search" id="search-input"
+      placeholder="Search customer, model, work order…"
+      oninput="onSearch(this.value)">
+    <button id="filter-btn" onclick="toggleFilter()">Filter</button>
+  </div>
+</div>
+
+<!-- FILTER CHIPS (hidden until Filter tapped) -->
+<div id="filter-chips">
+  <!-- rendered by JS from status list -->
+</div>
+
+<!-- PENDING SYNC WARNING -->
+<div id="sync-bar">⚠ Changes pending sync — reconnect to update all devices</div>
+
+<!-- STATS BAR -->
+<div id="stats-bar">
+  <!-- rendered by JS -->
+</div>
+
+<!-- JOB LIST -->
+<div id="loading"><span class="spinner-sm"></span>Loading jobs…</div>
+<div id="job-list" style="display:none"></div>
+<div id="refresh-hint">Pull down to refresh</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// TAGRO OS — app-jobs.html
+//
+// Thin client. Lists jobs. Derives status from timeline.
+// Routes to next app based on job state.
+// All data from Jobs service. No Worker calls.
+// ══════════════════════════════════════════════════════════
+
+// ── ROUTING TABLE ─────────────────────────────────────────
+// Derived from status. Never hardcoded per-job.
+// When a new status is added to statusFromEvent, add it here.
+const NEXT_ACTION = {
+  'Received':          { label: 'Inspect',        app: 'inspection', cls: 'ab-inspect'  },
+  'Inspecting':        { label: 'Continue',        app: 'inspection', cls: 'ab-inspect'  },
+  'Repairing':         { label: 'Workbench',       app: 'work',       cls: 'ab-work'     },
+  'On Hold':           { label: 'Resume',          app: 'work',       cls: 'ab-work'     },
+  'Waiting Parts':     { label: 'View Job',        app: 'work',       cls: 'ab-view'     },
+  'Awaiting Approval': { label: 'Approval',        app: 'approval',   cls: 'ab-approval' },
+  'Ready':             { label: 'Deliver',         app: 'work',       cls: 'ab-deliver'  },
+  'Delivered':         { label: 'Record',          app: 'work',       cls: 'ab-view'     },
+  'Completed':         { label: 'Record',          app: 'work',       cls: 'ab-view'     },
+};
+
+// Status → CSS class mapping (for badge and strip colours)
+const STATUS_CSS = {
+  'Received':           'received',
+  'Inspecting':         'inspecting',
+  'Repairing':          'repairing',
+  'On Hold':            'onhold',
+  'Waiting Parts':      'waitingparts',
+  'Awaiting Approval':  'awaitingapproval',
+  'Ready':              'ready',
+  'Delivered':          'delivered',
+  'Completed':          'delivered',
+};
+
+// ── STATE ─────────────────────────────────────────────────
+let allJobs      = [];
+let filteredJobs = [];
+let activeFilter = null;   // null = All
+let searchQuery  = '';
+
+// ── BOOT ──────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', boot);
+
+async function boot() {
+  loadJobs();
+  checkPendingSync();
+  renderFilterChips();
+
+  // Pull fresh jobs from Dropbox/Worker in background
+  try {
+    await window.parent?.Jobs?.pull();
+    loadJobs(); // Re-render with any new data
+  } catch {}
+}
+
+// ── LOAD JOBS ─────────────────────────────────────────────
+// Reads from the Jobs service — no Worker call.
+// Status derived here, not stored on job.
+function loadJobs() {
+  try {
+    const raw = window.parent?.Jobs?.all() || [];
+    // Annotate with derived status (never stored)
+    allJobs = raw.map(job => ({
+      ...job,
+      _status:  deriveStatus(job),
+      _ageDays: ageDays(job),
+    }));
+    allJobs.sort((a, b) =>
+      new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    );
+  } catch {
+    allJobs = [];
+  }
+  applyFilter();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('job-list').style.display = 'block';
+}
+
+// ── STATUS DERIVATION ─────────────────────────────────────
+// Reads statusFromEvent from the manifest via the OS.
+// Never hardcoded here. Same logic as Jobs.deriveStatus() in os-core.
+function deriveStatus(job) {
+  try {
+    // Prefer OS method if available
+    if (window.parent?.Jobs?.deriveStatus) {
+      return window.parent.Jobs.deriveStatus(job);
+    }
+  } catch {}
+  // Inline fallback for standalone/test use
+  const map    = window.parent?.TAGRO_MANIFEST?.statusFromEvent || {};
+  const events = (job.timeline || []).slice().reverse();
+  for (const ev of events) {
+    const s = map[ev.type];
+    if (s !== undefined && s !== null) return s;
+  }
+  return 'Received';
+}
+
+function ageDays(job) {
+  try {
+    if (window.parent?.Jobs?.ageDays) return window.parent.Jobs.ageDays(job);
+  } catch {}
+  return Math.floor(
+    (Date.now() - new Date(job.createdAt || job.date || Date.now()).getTime()) / 86400000
+  );
+}
+
+// ── SEARCH ────────────────────────────────────────────────
+function onSearch(val) {
+  searchQuery = val.toLowerCase().trim();
+  applyFilter();
+}
+
+// ── FILTER ────────────────────────────────────────────────
+const FILTER_STATUSES = [
+  'All',
+  'Received',
+  'Inspecting',
+  'Repairing',
+  'On Hold',
+  'Waiting Parts',
+  'Awaiting Approval',
+  'Ready',
+  'Delivered',
+];
+
+function renderFilterChips() {
+  const bar = document.getElementById('filter-chips');
+  bar.innerHTML = FILTER_STATUSES.map(s => `
+    <div class="filter-chip ${s === 'All' && !activeFilter ? 'active' : ''}"
+      data-status="${esc(s)}"
+      onclick="setFilter(${s === 'All' ? 'null' : `'${esc(s)}'`})">
+      ${esc(s)}
+    </div>
+  `).join('');
+}
+
+function setFilter(status) {
+  activeFilter = status;
+  // Update chip highlights
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    const s = c.dataset.status;
+    c.classList.toggle('active',
+      (status === null && s === 'All') || s === status
+    );
+  });
+  applyFilter();
+}
+
+function toggleFilter() {
+  const chips = document.getElementById('filter-chips');
+  const btn   = document.getElementById('filter-btn');
+  const open  = chips.classList.toggle('open');
+  btn.classList.toggle('active', open);
+}
+
+// ── APPLY FILTER + SEARCH ────────────────────────────────
+function applyFilter() {
+  filteredJobs = allJobs.filter(job => {
+    // Status filter
+    if (activeFilter && job._status !== activeFilter) return false;
+    // Search filter
+    if (searchQuery) {
+      const haystack = [
+        job.workOrder,
+        job.customer?.name,
+        job.customer?.phone,
+        job.machine?.model,
+        job.machine?.serial,
+        job._status,
+      ].join(' ').toLowerCase();
+      if (!haystack.includes(searchQuery)) return false;
+    }
+    return true;
+  });
+
+  renderStats();
+  renderList();
+}
+
+// ── STATS BAR ─────────────────────────────────────────────
+function renderStats() {
+  const counts = {};
+  allJobs.forEach(j => { counts[j._status] = (counts[j._status] || 0) + 1; });
+
+  const urgent   = allJobs.filter(j => j._ageDays >= 14 && j._status !== 'Delivered').length;
+  const active   = allJobs.filter(j => !['Delivered','Completed'].includes(j._status)).length;
+  const ready    = counts['Ready'] || 0;
+  const waiting  = (counts['On Hold'] || 0) + (counts['Waiting Parts'] || 0);
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-pill ${!activeFilter ? 'active' : ''}" onclick="setFilter(null)">
+      <span class="stat-num orange">${allJobs.length}</span>
+      <span class="stat-label">All Jobs</span>
+    </div>
+    <div class="stat-pill ${activeFilter === null ? '' : ''}" onclick="setFilter(null); setFilter(null)">
+      <span class="stat-num">${active}</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat-pill" onclick="setFilter('Ready')">
+      <span class="stat-num green">${ready}</span>
+      <span class="stat-label">Ready</span>
+    </div>
+    <div class="stat-pill" onclick="setFilter('On Hold')">
+      <span class="stat-num amber">${waiting}</span>
+      <span class="stat-label">Waiting</span>
+    </div>
+    ${urgent ? `
+    <div class="stat-pill" style="cursor:default">
+      <span class="stat-num red">${urgent}</span>
+      <span class="stat-label">14d+ Old</span>
+    </div>` : ''}
+  `;
+}
+
+// ── JOB LIST RENDER ──────────────────────────────────────
+function renderList() {
+  const container = document.getElementById('job-list');
+
+  if (!filteredJobs.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">${
+          searchQuery || activeFilter
+            ? 'No jobs match'
+            : 'No jobs yet'
+        }</div>
+        <div class="empty-sub">${
+          searchQuery
+            ? `No results for "${esc(searchQuery)}"`
+            : activeFilter
+            ? `No jobs with status "${esc(activeFilter)}"`
+            : 'Tap + New Job to receive the first machine.'
+        }</div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filteredJobs.map(job => jobCard(job)).join('');
+}
+
+function jobCard(job) {
+  const status  = job._status;
+  const css     = STATUS_CSS[status] || 'received';
+  const action  = NEXT_ACTION[status];
+  const age     = job._ageDays;
+  const ageCls  = age >= 14 ? 'urgent' : age >= 7 ? 'warn' : '';
+  const ageText = age === 0 ? 'Today'
+                : age === 1 ? 'Yesterday'
+                : age + ' days ago';
+
+  const serial = job.machine?.serial
+    ? `· ${esc(job.machine.serial)}`
+    : `<span style="opacity:.5">· No serial</span>`;
+
+  return `
+    <div class="job-card" onclick="openJob('${esc(job.id)}', '${esc(status)}')">
+      <div class="job-card-inner">
+        <div class="status-strip strip-${css}"></div>
+        <div class="job-card-body">
+          <div class="job-top">
+            <span class="job-wo">${esc(job.workOrder || '—')}</span>
+            <span class="job-age ${ageCls}">${ageText}</span>
+          </div>
+          <div class="job-customer">${esc(job.customer?.name || 'Unknown Customer')}</div>
+          <div class="job-machine">${esc(job.machine?.model || '—')} ${serial}</div>
+          <div class="job-footer">
+            <span class="status-badge s-${css}">${esc(status)}</span>
+            ${action ? `
+              <button class="action-btn ${action.cls}"
+                onclick="event.stopPropagation(); doAction('${esc(job.id)}', '${action.app}')">
+                ${esc(action.label)} →
+              </button>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── JOB ACTIONS ───────────────────────────────────────────
+function openJob(jobId, status) {
+  const action = NEXT_ACTION[status];
+  if (!action) return;
+  doAction(jobId, action.app);
+}
+
+function doAction(jobId, appId) {
+  try {
+    const launcher = window.parent?.AppLauncher;
+    if (!launcher) return;
+
+    // Check if the target app is enabled in the manifest
+    const manifest = window.parent?.TAGRO_MANIFEST;
+    const app      = manifest?.apps?.find(a => a.id === appId);
+
+    if (!app || !app.enabled) {
+      // Honest message — app is coming, not broken
+      window.parent?.Toast?.show(
+        appId === 'inspection' ? 'Inspection app coming soon' :
+        appId === 'approval'   ? 'Approval app coming soon'  :
+        'This app is not yet available'
+      );
+      return;
+    }
+
+    // Pass job context through OS launch context mechanism
+    launcher.open(appId, { jobId });
+  } catch {
+    // Calm failure — never expose internals
+    window.parent?.Toast?.show('Unable to open. Please try again.');
+  }
+}
+
+function openReceive() {
+  try {
+    window.parent?.AppLauncher?.open('receive');
+  } catch {}
+}
+
+// ── PENDING SYNC ──────────────────────────────────────────
+function checkPendingSync() {
+  try {
+    const q = window.parent?.OS?.get('tagros_pending_sync', []) || [];
+    document.getElementById('sync-bar').classList.toggle('show', q.length > 0);
+  } catch {}
+}
+
+// ── UTILITY ───────────────────────────────────────────────
+function esc(s) {
+  return s == null ? '' : String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>
