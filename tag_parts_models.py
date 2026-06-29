@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
 TAGRO OS — Parts Model Tagger
-Reads parts:master from KV via the Knowledge API,
-extracts model references from part names,
-adds a `models` array to each part,
-writes back to KV via /admin/kv-set.
-
-Run: python tag_parts_models.py
-
-Note: Parts with bare numbers like "210/230/250" (no MS/FS prefix)
-cannot be auto-tagged. They remain searchable via /knowledge/search.
-All named references like "MS 382", "FS 120/250", "MS 290/390/360" work.
+Uses requests library for reliable HTTPS on Windows.
+Run: pip install requests
+     python tag_parts_models.py
 """
 
-import json, re, os, urllib.request, sys
+import json, re, os, sys
+
+try:
+    import requests
+except ImportError:
+    print("Installing requests...")
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'requests'])
+    import requests
 
 # ── CONFIG ────────────────────────────────────────────────
 WORKER_URL  = 'https://tagro-os.icy-fire-d2ac.workers.dev'
@@ -25,7 +26,7 @@ if not OWNER_TOKEN:
     print("OWNER_TOKEN required. Exiting.")
     sys.exit(1)
 
-# ── KNOWN MODELS (longest first to avoid partial matches) ──
+# ── KNOWN MODELS ──────────────────────────────────────────
 KNOWN_MODELS = sorted([
     'MS 180', 'MS 182', 'MS 192T', 'MS 192 T',
     'MS 211', 'MS 230', 'MS 250', 'MS 260',
@@ -55,20 +56,15 @@ KNOWN_MODELS = sorted([
 ], key=len, reverse=True)
 
 def extract_models(name, stihl_name=''):
-    """Extract model references, handling slash-lists like MS 290/390/360."""
     text = (name + ' ' + stihl_name).upper()
-
-    # Expand slash-lists: "MS 290/390/360" → "MS 290 MS 390 MS 360"
     def expand_slash(m):
         prefix = m.group(1)
         nums   = m.group(2).split('/')
         return ' '.join(prefix.strip() + ' ' + n for n in nums)
-
     text = re.sub(
         r'((?:MS|FS|FSA|SR|BR|BG|BGA|BGE|SH|HT|HL|HLA|MSA|WP)\s{0,2})(\d+(?:/\d+)+)',
         expand_slash, text
     )
-
     found = []
     for model in KNOWN_MODELS:
         pattern = re.escape(model.upper())
@@ -77,75 +73,70 @@ def extract_models(name, stihl_name=''):
                 found.append(model)
     return found
 
-def api_get(path):
-    req = urllib.request.Request(WORKER_URL + path)
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read())
-
-def api_post(path, body):
-    data = json.dumps(body).encode('utf-8')
-    req  = urllib.request.Request(
-        WORKER_URL + path, data=data,
-        headers={'Content-Type': 'application/json'}
-    )
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return json.loads(r.read())
-
-# ── LOAD ──────────────────────────────────────────────────
-print("Loading parts master...")
-resp  = api_get('/knowledge/parts')
-parts = resp.get('data') or resp.get('parts') or []
-print(f"Loaded {len(parts)} parts")
+# ── LOAD PARTS ────────────────────────────────────────────
+print("Loading parts master from Worker...")
+try:
+    r = requests.get(f'{WORKER_URL}/knowledge/parts', timeout=60)
+    print(f"HTTP {r.status_code}")
+    if r.status_code != 200:
+        print("Error body:", r.text[:300])
+        sys.exit(1)
+    data  = r.json()
+    parts = data.get('data') or data.get('parts') or []
+    print(f"Loaded {len(parts)} parts")
+except Exception as e:
+    print(f"Failed to load parts: {e}")
+    sys.exit(1)
 
 if not parts:
     print("No parts found. Exiting.")
     sys.exit(1)
 
-# ── TAG ───────────────────────────────────────────────────
+# ── TAG MODELS ────────────────────────────────────────────
 tagged = untagged = unchanged = 0
 
 for p in parts:
     models   = extract_models(p.get('name',''), p.get('stihlName',''))
     existing = p.get('models', [])
-
     if set(models) == set(existing):
         unchanged += 1
         continue
-
     p['models'] = models
     if models: tagged += 1
     else:      untagged += 1
 
-print(f"\nResults:")
+print(f"\nTagging results:")
 print(f"  Tagged:    {tagged}")
-print(f"  Untagged:  {untagged}  (generic parts — still searchable)")
+print(f"  Untagged:  {untagged}  (generic parts — still searchable by name)")
 print(f"  Unchanged: {unchanged}")
 
-# Sample output
-print(f"\nSample tagged parts:")
+print(f"\nSample tagged:")
 for p in [x for x in parts if x.get('models')][:5]:
     print(f"  {p['name'][:50]:50} → {p['models']}")
 
-print(f"\nSample untagged (generic — no model in name):")
-for p in [x for x in parts if not x.get('models')][:3]:
+print(f"\nSample untagged:")
+for p in [x for x in parts if not p.get('models')][:3]:
     print(f"  {p['name'][:60]}")
 
 # ── WRITE BACK ────────────────────────────────────────────
-confirm = input(f"\nWrite {len(parts)} parts back to KV? (y/n): ").strip().lower()
+confirm = input(f"\nWrite {len(parts)} tagged parts back to KV? (y/n): ").strip().lower()
 if confirm != 'y':
     print("Cancelled.")
     sys.exit(0)
 
-print("Writing to KV (this may take a moment)...")
-resp2 = api_post('/admin/kv-set', {
-    'ownerToken': OWNER_TOKEN,
-    'key':        'parts:master',
-    'value':      parts
-})
-
-if resp2.get('ok'):
-    print(f"\n✓ parts:master updated.")
-    print(f"  /knowledge/parts/MS%20382 will now return MS 382 parts.")
-    print(f"  /knowledge/parts/FS%20120 will now return FS 120 parts.")
-else:
-    print(f"\n✗ Failed: {resp2}")
+print("Writing to KV...")
+try:
+    r2 = requests.post(
+        f'{WORKER_URL}/admin/kv-set',
+        json={ 'ownerToken': OWNER_TOKEN, 'key': 'parts:master', 'value': parts },
+        timeout=120
+    )
+    print(f"HTTP {r2.status_code}")
+    resp2 = r2.json()
+    if resp2.get('ok'):
+        print(f"\n✓ parts:master updated with model tags.")
+        print(f"  Test: curl \"{WORKER_URL}/knowledge/parts/MS%20382\"")
+    else:
+        print(f"✗ Failed: {resp2}")
+except Exception as e:
+    print(f"Write failed: {e}")
