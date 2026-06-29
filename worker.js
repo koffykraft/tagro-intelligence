@@ -524,12 +524,19 @@ async function handleKnowledgeManuals(modelId, env) {
       });
     }
 
-    // List objects in the model's folder
-    // R2 key convention: stihl/{MODEL_UPPER}/filename.pdf
-    const modelKey = modelId.toUpperCase().replace(/\s+/g, '_');
-    const prefix   = `stihl/${modelKey}/`;
+    // R2 path convention: stihl/{model_nospaces_lowercase}/sections/
+    // e.g. stihl/ms462/sections/carburetor_114200.json
+    const modelSlug = modelId.toLowerCase().replace(/[\s\-_]+/g, '');
+    const prefix    = `stihl/${modelSlug}/`;
 
-    const listed = await R2.list({ prefix, limit: 50 });
+    // List everything under the model folder (includes sections/ subfolder)
+    let listed = await R2.list({ prefix, limit: 200 });
+
+    // Also try with dash format as fallback (ms-462)
+    if (!listed?.objects?.length) {
+      const modelDash = modelId.toLowerCase().replace(/\s+/g, '-');
+      listed = await R2.list({ prefix: `stihl/${modelDash}/`, limit: 200 });
+    }
     if (!listed?.objects?.length) {
       return knowledgeList([], {
         confidence: 0,
@@ -538,22 +545,32 @@ async function handleKnowledgeManuals(modelId, env) {
       });
     }
 
-    const manuals = listed.objects.map(obj => {
-      const filename  = obj.key.split('/').pop();
-      const type      = classifyManual(filename);
-      return {
-        id:       obj.key,
-        key:      obj.key,
-        filename,
-        type,          // 'workshop_manual' | 'ipl' | 'owner_manual' | 'bulletin' | 'other'
-        label:    labelFromFilename(filename, type),
-        size:     obj.size,
-        uploaded: obj.uploaded,
-        // URL to fetch the file — apps request via Worker to keep R2 private
-        url:      `/knowledge/r2/${encodeURIComponent(obj.key)}`,
-        modelId,
-      };
-    });
+    // Filter to JSON index files only (each section has a .json + .png pair)
+    // JSON files contain the parts list for that section
+    // PNG files are the exploded diagram images
+    const manuals = listed.objects
+      .filter(obj => !obj.key.endsWith('/'))  // skip folder entries
+      .map(obj => {
+        const filename = obj.key.split('/').pop();
+        const ext      = filename.split('.').pop().toLowerCase();
+        const section  = obj.key.split('/').slice(-2)[0]; // parent folder name
+        const type     = ext === 'json' ? 'parts_section'
+                       : ext === 'png'  ? 'diagram_image'
+                       : classifyManual(filename);
+        return {
+          id:       obj.key,
+          key:      obj.key,
+          filename,
+          ext,
+          section,
+          type,
+          label:    labelFromFilename(filename, type),
+          size:     obj.size,
+          uploaded: obj.uploaded,
+          url:      `/knowledge/r2/${encodeURIComponent(obj.key)}`,
+          modelId,
+        };
+      });
 
     return knowledgeList(manuals, {
       alias:      'manuals',
@@ -727,7 +744,7 @@ async function handleKnowledgeHistory(serial, env) {
 
     // Query D1 for all jobs with this serial number
     const result = await D1.prepare(
-      `SELECT id, work_order, branch, created_at, customer_name, model,
+      `SELECT id, work_order, branch, created_at, customer_name, machine_model,
               complaint, status, updated_at
        FROM service_jobs
        WHERE machine_serial = ?
@@ -741,7 +758,7 @@ async function handleKnowledgeHistory(serial, env) {
       branch:      row.branch,
       date:        row.created_at,
       customer:    row.customer_name,
-      model:       row.model,
+      model:       row.machine_model,
       complaint:   row.complaint,
       status:      row.status,
       updatedAt:   row.updated_at,
@@ -1144,6 +1161,8 @@ async function upsertJobD1(D1, job) {
 // Classify a manual filename by type
 function classifyManual(filename) {
   const f = filename.toLowerCase();
+  if (f.endsWith('.json'))                                                     return 'parts_section';
+  if (f.endsWith('.png') || f.endsWith('.jpg'))                               return 'diagram_image';
   if (f.includes('workshop') || f.includes('repair') || f.includes('rm_'))   return 'workshop_manual';
   if (f.includes('ipl') || f.includes('parts_list') || f.includes('_pl_'))  return 'ipl';
   if (f.includes('owner') || f.includes('instruction') || f.includes('im_')) return 'owner_manual';
